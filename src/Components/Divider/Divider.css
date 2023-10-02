@@ -1,0 +1,21 @@
+.divider::before,
+.divider::after {
+    position: absolute;
+    content: '';
+}
+
+.divider::after {
+    left: 160%;
+    top: 50%;
+    width: 100px;
+    height: 2px;
+    background-color: gray;
+}
+
+.divider::before {
+    right: 160%;
+    top: 50%;
+    width: 100px;
+    height: 2px;
+    background-color: gray;
+}
