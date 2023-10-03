@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GOOGLE_CLIENT_ID } from "./Constans/Api";
 import { Provider } from "react-redux";
 import store from "./Redux/Store";
+import SnackBar from './Components/SnackBar';
 import Header from "./Components/Header";
 import AllRoutes from './Routes';
 import ReactDOM from 'react-dom/client';
@@ -37,11 +38,12 @@ root.render(
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <Provider store={store}>
               {/* <Header /> */}
+              <SnackBar />
               <AllRoutes />
             </Provider>
           </GoogleOAuthProvider>
         </ThemeProvider>
-        <ReactQueryDevtools />
+        {/* <ReactQueryDevtools /> */}
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>

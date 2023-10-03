@@ -12,14 +12,16 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Divider from "../../Components/Divider";
 import CircularButton from "../../Components/Buttons/CircularButton/CircularButton";
+import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
 import SideGrid from "../../Components/Layouts/Auth/SideGrid";
+import useSystem from "../../Hooks/useSystem";
 import { ActionCreators as userActions } from "../../Redux/Actions/User.actions";
 import { logIn, googleLogIn, getUserData } from "../../Services/User.service";
-import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
 
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { showError, showSuccess } = useSystem();
   const [loading, setLoading] = React.useState(false);
 
   const getUserMutation = useMutation({
@@ -38,25 +40,37 @@ export default function Login() {
       .then((res) => {
         dispatch(userActions.login(res.data));
         getUserMutation.mutate();
+        showSuccess("Successfully Logged In.");
         navigate("/articles");
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        const err = error?.response?.data || error.message;
+        showError(err);
+      })
       .finally(() => setLoading(false));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(event.currentTarget);
     const data = new FormData(event.currentTarget);
-    console.log(data);
+
+    const username = data.get("username")?.trim();
+    const password = data.get("password")?.trim();
+    const isValid = username && password;
+    if (!isValid) return showError("Username & Password both are required!");
+
     setLoading(true);
     logIn(data)
       .then((res) => {
         dispatch(userActions.login(res.data));
         getUserMutation.mutate();
+        showSuccess("Successfully Logged In.");
         navigate("/articles");
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        const err = error?.response?.data || error.message;
+        showError(err);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -117,7 +131,6 @@ export default function Login() {
             />
             <br />
             <br />
-            <br />
             <CircularButton
               text="Log In"
               loading={loading}
@@ -136,7 +149,7 @@ export default function Login() {
                       textDecoration: "underline",
                     },
                   }}
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/password/reset")}
                 >
                   {"Forgot password?"}
                 </Link>

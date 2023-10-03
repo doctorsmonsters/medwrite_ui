@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "../../Components/Divider";
 import CircularButton from "../../Components/Buttons/CircularButton/CircularButton";
 import SideGrid from "../../Components/Layouts/Auth/SideGrid";
+import useSystem from "../../Hooks/useSystem";
 import { ActionCreators as userActions } from "../../Redux/Actions/User.actions";
 import { signUp, googleLogIn, getUserData } from "../../Services/User.service";
 import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
@@ -25,6 +26,7 @@ const initialForm = {
 export default function SignUp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useSystem();
   const [loading, setLoading] = React.useState(false);
   const [signUpForm, setSignUpform] = React.useState(initialForm);
   const [isOk, setIsOk] = React.useState(false);
@@ -51,24 +53,33 @@ export default function SignUp() {
       .then((res) => {
         dispatch(userActions.login(res.data));
         getUserMutation.mutate();
+        showSuccess("Signed up Successfully.");
         navigate("/articles");
       })
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        let _error = error?.response?.data || error.message;
+        showError(_error);
+      })
       .finally(() => setLoading(false));
   };
 
   const handleSubmit = () => {
-    if (isOk && signUpForm.password1 === signUpForm.password2) {
+    if (isOk) {
+      if (signUpForm.password1 !== signUpForm.password2)
+        return showError("The passwords does not match");
       setLoading(true);
       signUp(signUpForm)
         .then((res) => {
-          localStorage.setItem("userToken", res.data.key);
           navigate("/login");
+          showSuccess("Signed up Successfully.");
         })
-        .catch((error) => console.error(error))
+        .catch((error) => {
+          let _error = error?.response?.data || error.message;
+          showError(_error);
+        })
         .finally(() => setLoading(false));
     } else {
-      console.error("invalid data");
+      showError("kindly provide us with the following details");
     }
   };
 
