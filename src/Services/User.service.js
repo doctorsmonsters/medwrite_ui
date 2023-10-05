@@ -39,4 +39,3 @@ export const resetPassword = (data) => {
 export const resetPasswordConfirm = (data) => {
   return axios.post("/auth/password/reset/confirm/", data);
 };
-

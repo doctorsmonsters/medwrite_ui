@@ -6,7 +6,6 @@ export const getArticles = () => {
   return axios.get("/article", config);
 };
 
-
 export const createArticle = (data) => {
   const config = getAxiosConfig();
   return axios.post("/article/", data, config);

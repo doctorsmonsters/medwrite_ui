@@ -1,3 +1,3 @@
 export const SystemTypes = {
-  TOAST: "TOAST"
+  TOAST: "TOAST",
 };

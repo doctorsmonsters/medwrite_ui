@@ -4,5 +4,5 @@ export const ActionCreators = {
   showToast: (data) => ({
     type: SystemTypes.TOAST,
     payload: { data },
-  })
+  }),
 };
