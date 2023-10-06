@@ -67,14 +67,15 @@ export default function Table({
         pageSizeOptions={[5, 10]}
         checkboxSelection
         disableRowSelectionOnClick
-        rowSelectionModel={[...selectedRows.map(item => item.id)]}
+        rowSelectionModel={[...selectedRows.map((item) => item.id)]}
         onRowClick={(row, event) => {
           event.preventDefault();
-          navigate(`/articles/view/${row.row.id}`)
-
+          navigate(`/articles/view/${row.row.id}`);
         }}
-        onRowSelectionModelChange={(rows) =>  {
-          const selectedRowData = data.filter(row => rows.includes(row.id.toString()))
+        onRowSelectionModelChange={(rows) => {
+          const selectedRowData = data.filter((row) =>
+            rows.includes(row.id.toString())
+          );
           setSelectedRows(selectedRowData);
         }}
       />
