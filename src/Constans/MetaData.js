@@ -1,4 +1,5 @@
 import { formatSemanticDate } from "../Constans/Helpers";
+import { SiAppwrite } from "react-icons/si";
 
 export const ARTICLE_TABLE_COLUMNS = [
   { field: "title", headerName: "Name", width: 300 },
@@ -44,7 +45,6 @@ export const CKEDITOR_CONFIGS = {
   },
 };
 
-
 export const navLinks = [
   {
     title: "About Us",
@@ -79,3 +79,43 @@ export const features = [
     text: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
   },
 ];
+
+export const homeContent = {
+  hero: {
+    title: "Generative AI assistance for manuscript writing challenge",
+    para: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+  },
+  work: {
+    title: "How Does it Work",
+    para: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+    cards: [
+      {
+        icon: <SiAppwrite size={50} className="text-charcol" />,
+        title: "heading",
+        text: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+      },
+      {
+        icon: <SiAppwrite size={50} className="text-charcol" />,
+        title: "heading",
+        text: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+      },
+      {
+        icon: <SiAppwrite size={50} className="text-charcol" />,
+        title: "heading",
+        text: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+      },
+    ],
+  },
+  about: {
+    para1:
+      "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+    para2:
+      "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps.",
+    para3:
+      "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts.",
+  },
+  cta: {
+    title: "DEDICATED TEAM OF CUSTOMER STATISFACTION EXPERTS",
+    para: "Experience the power of AI as you effortlessly create professional and visually captivating manuscripts. Our web app not only helps you search through research paper databases, but also provides stylistic rendering options to make your logo truly stand out.",
+  },
+};

@@ -17,19 +17,23 @@ import {
 import { CgMenuLeftAlt as MenuIcon } from "react-icons/cg";
 import useSystem from "../../Hooks/useSystem";
 import ModalButton from "../Buttons/ModalButton";
+import ProfileMenu from "../ProfileMenu";
 
-export default function ButtonAppBar() {
+export default function Header({ isConcise }) {
   const navigate = useNavigate();
   const isLogged = useSelector((state) => state.user.isLogged);
-  const { logout, navItems } = useSystem();
   const matches = useMediaQuery("(min-width:1024px)");
+  const { logout, navItems } = useSystem();
   const [open, setOpen] = React.useState(false);
 
   return (
     <Box sx={{ flexGrow: 1 }} component="nav">
-      <AppBar position="static" sx={{ background: "transparent", py: 2 }}>
+      <AppBar
+        position="static"
+        sx={{ background: "transparent", py: isConcise ? 0 : 2 }}
+      >
         <Toolbar sx={{ color: "primary.main" }}>
-          {!matches && (
+          {!matches && !isConcise && (
             <IconButton
               size="large"
               edge="start"
@@ -50,7 +54,7 @@ export default function ButtonAppBar() {
           >
             MedWriter
           </Typography>
-          {matches && (
+          {matches && !isConcise && (
             <>
               <List
                 sx={{
@@ -83,7 +87,7 @@ export default function ButtonAppBar() {
               </List>
 
               <Box component="div" className="flex items-center ml-auto">
-                {!isLogged ? (
+                {!isLogged && (
                   <>
                     <Link
                       mx={3}
@@ -103,15 +107,13 @@ export default function ButtonAppBar() {
                       onClick={() => navigate("/singup")}
                     />
                   </>
-                ) : (
-                  <ModalButton
-                    text="Logout"
-                    classes="!rounded-lg !px-8"
-                    onClick={() => logout()}
-                  />
                 )}
               </Box>
             </>
+          )}
+
+          {matches && isLogged && (
+            <ProfileMenu classes="ml-auto cursor-pointer" />
           )}
         </Toolbar>
       </AppBar>

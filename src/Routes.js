@@ -5,6 +5,7 @@ import SignUp from "./Pages/SignUp";
 import VerifyEmail from "./Pages/VerifyEmail";
 import Article from "./Pages/Article";
 import ArticleCreate from "./Pages/ArticleCreate";
+import ArticleView from "./Pages/ArticleView";
 import PasswordChange from "./Pages/PasswordChange";
 import PasswordReset from "./Pages/PasswordReset";
 import PasswordResetConfirm from "./Pages/PasswordResetConfirm";
@@ -16,7 +17,8 @@ const AllRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/articles" element={<Article />} />
-      <Route path="/articles/:uuid/" element={<ArticleCreate />} />
+      <Route path="/articles/create/:uuid/" element={<ArticleCreate />} />
+      <Route path="/articles/view/:uuid/" element={<ArticleView />} />
       <Route path="/email/confirm/:token" element={<VerifyEmail />} />
       <Route path="/password/change" element={<PasswordChange />} />
       <Route path="/password/reset" element={<PasswordReset />} />

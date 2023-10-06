@@ -4,11 +4,9 @@ import { ActionCreators as userActions } from "../Redux/Actions/User.actions";
 import { navLinks, loggedNavLinks } from "../Constans/MetaData";
 import { logout as logoutServer } from "../Services/User.service";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 
 const useSystem = () => {
   const user = useSelector((state) => state.user)
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const logoutMutation = useMutation({

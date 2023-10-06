@@ -8,9 +8,8 @@ const TopBar = () => {
   return (
     <Box
       component="header"
-      className="flex items-center justify-center text-center md:text-left"
+      className="flex items-center justify-center text-center md:text-left bg-green-dark"
       sx={{
-        backgroundColor: "#00231f",
         py: 2,
         px: 2,
         letterSpacing: "1px",
@@ -25,10 +24,9 @@ const TopBar = () => {
         {"Generative AI assistance for manuscript writing challenge"}
         <Link
           sx={{
-            color: "#41d9b5",
             ml: 2,
           }}
-          className="cursor-pointer flex items-center"
+          className="cursor-pointer flex items-center !text-green-light"
           onClick={() => navigate("/login")}
         >
           {"Try it for free"}

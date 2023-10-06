@@ -58,3 +58,42 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* Customize the scrollbar for Firefox */
+/* You may need to add vendor prefixes for other browsers */
+
+/* Track */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background: #d5dadd; /* Change this to your desired thumb color */
+}
+
+/* Track on Firefox */
+/* You may need to add vendor prefixes for other browsers */
+/* For Firefox, scrollbar customization requires different selectors */
+/* It's not as widely supported as webkit-based browsers */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d5dadd transparent;
+}
+
+/* Customize the scrollbar on Firefox */
+/* These styles will only apply if scrollbar customization is supported */
+/* You can adjust the colors and styles to your preference */
+/* This example will make the scrollbar gray with a transparent thumb */
+
+/* Track on Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #d5dadd transparent;
+}
+
+/* Thumb on Firefox */
+/* You can customize the thumb appearance */
+html::-webkit-scrollbar-thumb {
+  background: #d5dadd;
+}

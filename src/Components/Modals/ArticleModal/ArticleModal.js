@@ -1,12 +1,10 @@
 import * as React from "react";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { FormControl, TextField } from "@mui/material";
-import { AiOutlineClose } from "react-icons/ai";
-import CircularButton from "../../Buttons/CircularButton/CircularButton";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FormControl, TextField, Typography, Box, Modal } from "@mui/material";
+import { AiOutlineClose } from "react-icons/ai";
 import { createArticle } from "../../../Services/Article.service";
+import useSystem from "../../../Hooks/useSystem";
+import CircularButton from "../../Buttons/CircularButton/CircularButton";
 
 const style = {
   position: "absolute",
@@ -20,10 +18,17 @@ const style = {
 const ArticleModal = ({ open, setOpen }) => {
   const queryClient = useQueryClient();
   const [title, setTitle] = React.useState("");
+  const { showSuccess, showError } = useSystem();
+
   const handleClose = () => setOpen(false);
 
   const createArticleMutation = useMutation({
-    mutationFn: (data) => createArticle(data),
+    mutationFn: (data) =>
+      createArticle(data)
+        .then(() => {
+          showSuccess("Article Created Successfully.");
+        })
+        .catch((error) => showError(error)),
     onSuccess: () => {
       queryClient.invalidateQueries(["article"]);
     },
@@ -35,6 +40,7 @@ const ArticleModal = ({ open, setOpen }) => {
       title,
       content: `Content For ${title}`,
     });
+    setTitle("");
     handleClose();
   };
 

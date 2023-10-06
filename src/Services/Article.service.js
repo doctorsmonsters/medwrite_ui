@@ -10,3 +10,8 @@ export const createArticle = (data) => {
   const config = getAxiosConfig();
   return axios.post("/article/", data, config);
 };
+
+export const bulkDelete = (data) => {
+  const config = getAxiosConfig();
+  return axios.post("/bulk_delete_article/", data, config);
+};

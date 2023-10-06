@@ -2,7 +2,6 @@ import React from "react";
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GOOGLE_CLIENT_ID } from "./Constans/Api";
@@ -20,9 +19,13 @@ const theme = createTheme({
     },
     primary: {
       main: "#212F3C",
+      light: "#dee6eb",
+      dark: "#9fb6be",
     },
     light: {
-      main: "#FFFFE0",
+      main: "#9fb6be",
+      light: "#dee6eb",
+      dark: "#9fb6be",
     },
     feature: {
       main: "#00231f",
@@ -43,7 +46,6 @@ root.render(
             </Provider>
           </GoogleOAuthProvider>
         </ThemeProvider>
-        {/* <ReactQueryDevtools /> */}
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>

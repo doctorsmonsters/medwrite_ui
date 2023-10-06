@@ -2,7 +2,14 @@ import React from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 
-const CircularButton = ({ loading, text, onClick, disabled, type='button' }) => {
+const CircularButton = ({
+  loading,
+  text,
+  onClick,
+  disabled,
+  type = "button",
+  classes = "",
+}) => {
   return (
     <Button
       type={type}
@@ -11,6 +18,7 @@ const CircularButton = ({ loading, text, onClick, disabled, type='button' }) => 
       color="secondary"
       onClick={onClick}
       disabled={disabled}
+      className={classes}
       sx={{ py: 1.5 }}
     >
       {loading && (
