@@ -1,4 +1,5 @@
 import * as React from "react";
+import clsx from "clsx";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
@@ -33,7 +34,7 @@ export default function Header({ isConcise }) {
         sx={{ background: "transparent", py: isConcise ? 0 : 2 }}
       >
         <Toolbar sx={{ color: "primary.main" }}>
-          {!matches && !isConcise && (
+          {!matches  && (
             <IconButton
               size="large"
               edge="start"
@@ -54,7 +55,7 @@ export default function Header({ isConcise }) {
           >
             MedWriter
           </Typography>
-          {matches && !isConcise && (
+          {matches && (
             <>
               <List
                 sx={{
@@ -103,8 +104,8 @@ export default function Header({ isConcise }) {
                     </Link>
                     <ModalButton
                       text="Get MedWriter it's free"
-                      classes="!rounded-lg"
-                      onClick={() => navigate("/singup")}
+                      classes={clsx("!rounded-lg", isConcise && "!py-2")}
+                      onClick={() => navigate("/signup")}
                     />
                   </>
                 )}

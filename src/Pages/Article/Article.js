@@ -71,7 +71,7 @@ const Article = () => {
   return (
     <ProtectedWrapper>
       <Header isConcise={true} />
-      <Box component="main" px={5} py={5}>
+      <Box component="main" py={7} className="px-6 md:px-10">
         {/* Heading */}
         <Box mb={3}>
           <div className="flex items-center">

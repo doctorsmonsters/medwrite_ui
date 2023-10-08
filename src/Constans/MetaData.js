@@ -2,7 +2,14 @@ import { formatSemanticDate } from "../Constans/Helpers";
 import { SiAppwrite } from "react-icons/si";
 
 export const ARTICLE_TABLE_COLUMNS = [
-  { field: "title", headerName: "Name", width: 300 },
+  {
+    field: "title",
+    headerName: "Name",
+    width: 300,
+    renderCell: (params) => (
+      <span className="cursor-pointer">{params.value}</span>
+    ),
+  },
   {
     field: "created_at",
     headerName: "Created At",

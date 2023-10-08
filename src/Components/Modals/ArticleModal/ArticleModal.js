@@ -28,7 +28,10 @@ const ArticleModal = ({ open, setOpen }) => {
         .then(() => {
           showSuccess("Article Created Successfully.");
         })
-        .catch((error) => showError(error)),
+        .catch((error) => {
+          const err = error?.response?.data || error.message;
+          showError(err);
+        }),
     onSuccess: () => {
       queryClient.invalidateQueries(["article"]);
     },
@@ -36,6 +39,7 @@ const ArticleModal = ({ open, setOpen }) => {
 
   const onClick = (e) => {
     e.preventDefault();
+    if (!title) return showError("Title may not be blank.");
     createArticleMutation.mutate({
       title,
       content: `Content For ${title}`,
@@ -101,7 +105,7 @@ const ArticleModal = ({ open, setOpen }) => {
             className="border border-b-gray-200"
           >
             <CircularButton
-              text="submit"
+              text="button"
               onClick={onClick}
               loading={createArticleMutation.isLoading}
             />

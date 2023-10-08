@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { ActionCreators as systemActions } from "../Redux/Actions/Sytstem.actions";
 import { ActionCreators as userActions } from "../Redux/Actions/User.actions";
 import { navLinks, loggedNavLinks } from "../Constans/MetaData";
@@ -6,7 +7,8 @@ import { logout as logoutServer } from "../Services/User.service";
 import { useMutation } from "@tanstack/react-query";
 
 const useSystem = () => {
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.user);
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const logoutMutation = useMutation({
@@ -40,7 +42,11 @@ const useSystem = () => {
   };
 
   const logout = logoutMutation.mutate;
-  const navItems = user.isLogged ? [...navLinks, ...loggedNavLinks] : navLinks;
+  const navItems = user.isLogged
+    ? location.pathname === "/"
+      ? [...navLinks, ...loggedNavLinks]
+      : loggedNavLinks
+    :  location.pathname === "/" ? navLinks : [];
   return { showError, showSuccess, logout, navItems };
 };
 
