@@ -76,7 +76,7 @@ const ArticleView = () => {
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Edit"
-      onClick={() => {}}
+      onClick={() => navigate(`/articles/create/${artilceQuery.data.id}`)}
     />,
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
@@ -125,7 +125,7 @@ const ArticleView = () => {
 
               <Box
                 compoenent="div"
-                className="space-y-8"
+                className=""
                 dangerouslySetInnerHTML={{ __html: artilceQuery.data.content }}
               />
             </Box>

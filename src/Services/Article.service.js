@@ -24,3 +24,16 @@ export const deleteArticle = (uuid) => {
   const config = getAxiosConfig();
   return axios.delete(`/article/${uuid}`, config);
 };
+
+export const updateArticle = (uuid, data) => {
+  const config = getAxiosConfig();
+  return axios.put(`/article/${uuid}/`, data, config);
+};
+
+export const searchDatabases = (params) => {
+  const config = getAxiosConfig();
+  return axios.get("/search/databases", {
+    ...config,
+    params: params,
+  });
+};

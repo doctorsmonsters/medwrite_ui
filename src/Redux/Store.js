@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 import userReducer from "./Reducers/User.reducer";
 import systemReducer from "./Reducers/System.reducer";
+import articleReducer from "./Reducers/Artilce.reducer";
 
 const saveToLocalStorage = (store) => (next) => (action) => {
   const result = next(action);
@@ -17,7 +18,11 @@ const saveToLocalStorage = (store) => (next) => (action) => {
 };
 
 const store = configureStore({
-  reducer: { user: userReducer, system: systemReducer },
+  reducer: {
+    user: userReducer,
+    system: systemReducer,
+    article: articleReducer,
+  },
   middleware: [thunk, saveToLocalStorage],
 });
 

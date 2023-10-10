@@ -1,7 +1,10 @@
 import * as React from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormControl, TextField, Typography, Box, Modal } from "@mui/material";
 import { AiOutlineClose } from "react-icons/ai";
+import { ActionCreators as ArticleCreators } from "../../../Redux/Actions/Article.actions";
 import { createArticle } from "../../../Services/Article.service";
 import useSystem from "../../../Hooks/useSystem";
 import CircularButton from "../../Buttons/CircularButton/CircularButton";
@@ -16,6 +19,8 @@ const style = {
 };
 
 const ArticleModal = ({ open, setOpen }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [title, setTitle] = React.useState("");
   const { showSuccess, showError } = useSystem();
@@ -25,8 +30,10 @@ const ArticleModal = ({ open, setOpen }) => {
   const createArticleMutation = useMutation({
     mutationFn: (data) =>
       createArticle(data)
-        .then(() => {
+        .then((res) => {
           showSuccess("Article Created Successfully.");
+          dispatch(ArticleCreators.setWorkingArticle(res.data));
+          navigate(`/articles/create/${res.data.id}`);
         })
         .catch((error) => {
           const err = error?.response?.data || error.message;
@@ -105,7 +112,7 @@ const ArticleModal = ({ open, setOpen }) => {
             className="border border-b-gray-200"
           >
             <CircularButton
-              text="button"
+              text="Create"
               onClick={onClick}
               loading={createArticleMutation.isLoading}
             />

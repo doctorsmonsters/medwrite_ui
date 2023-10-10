@@ -48,7 +48,7 @@ export const CKEDITOR_CONFIGS = {
       ["RemoveFormat", "Source"],
     ],
     width: "full",
-    height: "full",
+    height: "400px",
   },
 };
 
