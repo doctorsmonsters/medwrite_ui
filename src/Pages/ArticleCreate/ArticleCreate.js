@@ -141,9 +141,9 @@ const ArticleCreate = () => {
               <Editor
                 apiKey="1ug1scsglfqzvtoyim5dh7pz8dx4yph03n58bxsqf5dn1gdk"
                 onInit={(evt, editor) => (editorRef.current = editor)}
-                initialValue={artilceForm.content}
+                initialValue={objectQuery.data.content}
                 init={{
-                  height: 500,
+                  height: 700,
                   width: "100%",
                   menubar: true,
                   plugins:
@@ -256,25 +256,3 @@ const ArticleCreate = () => {
 };
 
 export default ArticleCreate;
-
-// <CKEditor
-//   editor={ClassicEditor}
-//   data={artilceForm.content}
-//   // onReady={(editor) => {
-//   //   // You can store the "editor" and use when it is needed.
-//   //   console.log("Editor is ready to use!", editor);
-//   // }}
-//   config={CKEDITOR_CONFIGS}
-//   onChange={(event, editor) => {
-//     const data = editor.getData();
-//     handleArticleForm({
-//       target: { name: "content", value: data },
-//     });
-//   }}
-//   // onBlur={(event, editor) => {
-//   //   console.log("Blur.", editor);
-//   // }}
-//   // onFocus={(event, editor) => {
-//   //   console.log("Focus.", editor);
-//   // }}
-// />;
