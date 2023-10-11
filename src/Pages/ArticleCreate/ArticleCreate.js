@@ -9,9 +9,7 @@ import {
   searchDatabases,
   updateArticle,
 } from "../../Services/Article.service";
-import { CKEDITOR_CONFIGS } from "../../Constans/MetaData";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { Editor } from "@tinymce/tinymce-react";
 import Loading from "../../Components/Loading";
 import Header from "../../Components/Header";
 import ReadMore from "../../Components/ReadMore";
@@ -32,6 +30,15 @@ const ArticleCreate = () => {
     title: "",
     content: "",
   });
+
+  const editorRef = React.useRef(null);
+
+  const log = () => {
+    if (editorRef.current) {
+      console.log(editorRef.current.getContent());
+    }
+  };
+
   const objectQuery = useQuery({
     queryFn: () =>
       getArticleById(uuid)
@@ -49,7 +56,10 @@ const ArticleCreate = () => {
 
   const objectMutation = useMutation({
     mutationFn: () =>
-      updateArticle(uuid, artilceForm)
+      updateArticle(uuid, {
+        ...artilceForm,
+        content: editorRef.current.getContent(),
+      })
         .then((res) => {
           navigate(`/articles/view/${uuid}`);
           return res.data;
@@ -128,15 +138,19 @@ const ArticleCreate = () => {
             </Box>
 
             <Box className="my-4" id="editor">
-              <CKEditor
-                editor={ClassicEditor}
-                data={artilceForm.content}
-                config={CKEDITOR_CONFIGS}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  handleArticleForm({
-                    target: { name: "content", value: data },
-                  });
+              <Editor
+                apiKey="1ug1scsglfqzvtoyim5dh7pz8dx4yph03n58bxsqf5dn1gdk"
+                onInit={(evt, editor) => (editorRef.current = editor)}
+                initialValue={artilceForm.content}
+                init={{
+                  height: 500,
+                  width: "100%",
+                  menubar: true,
+                  plugins:
+                    "a11ychecker advcode advlist advtable anchor autocorrect autolink autoresize autosave casechange charmap checklist code codesample directionality editimage emoticons export footnotes formatpainter fullscreen help image importcss inlinecss insertdatetime link linkchecker lists media mediaembed mentions mergetags nonbreaking pagebreak pageembed permanentpen powerpaste preview quickbars save searchreplace table tableofcontents tinydrive tinymcespellchecker typography visualblocks visualchars wordcount",
+                  toolbar_sticky: true,
+                  content_style:
+                    "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
                 }}
               />
             </Box>
