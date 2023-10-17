@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Typography, Box } from "@mui/material";
+import { removeHTMLTags } from "../../Constans/Helpers";
 
-function DescriptionWithReadMore({ description, maxChars = 100, link }) {
+function DescriptionWithReadMore({ description, maxChars = 100, link, handleSelect }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const toggleDescription = () => {
@@ -15,7 +16,7 @@ function DescriptionWithReadMore({ description, maxChars = 100, link }) {
       className="text-gray-700 pb-4 font-semibold"
     >
       {showFullDescription ? (
-        <div>{description}</div>
+        <div>{removeHTMLTags(description)}</div>
       ) : (
         <div>{description?.slice(0, maxChars)}</div>
       )}
@@ -39,10 +40,10 @@ function DescriptionWithReadMore({ description, maxChars = 100, link }) {
         </a>
 
         <span
-          onClick={toggleDescription}
+          onClick={handleSelect}
           className="capitalize text-gray-600 font-bold cursor-pointer border-b-2 border-transparent hover:border-black"
         >
-          Refer this
+          Select
         </span>
       </Box>
     </Typography>

@@ -92,6 +92,7 @@ const Article = () => {
           container
           component="div"
           mb={5}
+          gap={2}
           className="flex items-end justify-between"
         >
           <Grid item sm={12} md={10}>
@@ -116,7 +117,7 @@ const Article = () => {
           </Grid>
           <Grid item sm={12} md={2} className="flex justify-end">
             <ModalButton
-              classes=" !rounded-lg"
+              classes=" !rounded-lg sm:w-full"
               text="Create"
               onClick={() => setOpen((prev) => !prev)}
               icon={<BsPlusCircle className="mr-3 text-xl" />}

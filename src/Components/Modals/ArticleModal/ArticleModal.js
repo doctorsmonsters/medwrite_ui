@@ -16,6 +16,12 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: "50%",
   bgcolor: "background.paper",
+  "@media (max-width: 1024px)": {
+    width: "70%",
+  },
+  "@media (max-width: 768px)": {
+    width: "80%",
+  },
 };
 
 const ArticleModal = ({ open, setOpen }) => {
@@ -26,7 +32,6 @@ const ArticleModal = ({ open, setOpen }) => {
   const { showSuccess, showError } = useSystem();
 
   const handleClose = () => setOpen(false);
-
   const createArticleMutation = useMutation({
     mutationFn: (data) =>
       createArticle(data)
@@ -44,8 +49,7 @@ const ArticleModal = ({ open, setOpen }) => {
     },
   });
 
-  const onClick = (e) => {
-    e.preventDefault();
+  const onClick = () => {
     if (!title) return showError("Title may not be blank.");
     createArticleMutation.mutate({
       title,
@@ -58,6 +62,7 @@ const ArticleModal = ({ open, setOpen }) => {
   return (
     <div>
       <Modal
+        disableRestoreFocus
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -91,13 +96,14 @@ const ArticleModal = ({ open, setOpen }) => {
           >
             <FormControl fullWidth>
               <TextField
+                autoFocus
                 margin="normal"
                 required
                 id="title"
+                onKeyUp={(e) => e.key === "Enter" && onClick()}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 label="Enter Title"
-                autoFocus
               />
             </FormControl>
           </Box>
@@ -112,6 +118,7 @@ const ArticleModal = ({ open, setOpen }) => {
             className="border border-b-gray-200"
           >
             <CircularButton
+              type="button"
               text="Create"
               onClick={onClick}
               loading={createArticleMutation.isLoading}

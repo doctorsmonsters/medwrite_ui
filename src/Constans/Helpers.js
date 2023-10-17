@@ -17,3 +17,7 @@ export const clearLocalStorage = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("userToken");
 };
+
+export function removeHTMLTags(inputText) {
+  return inputText.replace(/<[^>]*>/g, "");
+}

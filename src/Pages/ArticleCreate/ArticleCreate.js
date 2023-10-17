@@ -2,14 +2,24 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Box, Typography, TextField, Drawer } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Drawer,
+  CircularProgress,
+  Modal,
+} from "@mui/material";
 import { BiSearchAlt } from "react-icons/bi";
 import {
   getArticleById,
   searchDatabases,
   updateArticle,
 } from "../../Services/Article.service";
+import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
+import { removeHTMLTags } from "../../Constans/Helpers";
+import PromptModal from "../../Components/Modals/PromptModal";
 import Loading from "../../Components/Loading";
 import Header from "../../Components/Header";
 import ReadMore from "../../Components/ReadMore";
@@ -25,19 +35,16 @@ const ArticleCreate = () => {
   const uuid = params.uuid;
   const { showError } = useSystem();
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [promptProps, setpromptProps] = React.useState({});
+  const [promptOpen, setPromptOpen] = React.useState(false);
   const [artilceForm, setArticleForm] = React.useState({
     title: "",
     content: "",
   });
 
   const editorRef = React.useRef(null);
-
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
 
   const objectQuery = useQuery({
     queryFn: () =>
@@ -90,9 +97,54 @@ const ArticleCreate = () => {
     },
   });
 
+  const handleAction = async (type, content) => {
+    setLoading(true);
+    const params = {
+      text: content,
+      prompt_key: type,
+    };
+    return processText(params)
+      .then((res) => res.data.data)
+      .catch((error) => {
+        const err = error?.response?.data || error.message;
+        showError(err);
+        return content;
+      })
+      .finally(() => setLoading(false));
+  };
+
   // handlers
   const handleArticleForm = ({ target: { name, value } }) => {
     setArticleForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const EditorContentHandler = (type, data) => {
+    switch (type) {
+      case "h":
+        editorRef.current.execCommand(
+          "mceInsertContent",
+          false,
+          `<h3>${data}</h3>`
+        );
+        break;
+      case "p":
+        editorRef.current.execCommand(
+          "mceInsertContent",
+          false,
+          `<p>${data}</p>`
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
+  const addTextToEditor = ({ title, abstractText }) => {
+    if (editorRef.current) {
+      EditorContentHandler("h", title);
+      EditorContentHandler("p", removeHTMLTags(abstractText));
+    }
+    setOpen((prev) => !prev);
   };
 
   return (
@@ -137,20 +189,93 @@ const ArticleCreate = () => {
               />
             </Box>
 
-            <Box className="my-4" id="editor">
+            <Box component="div" className="my-4" id="editor">
               <Editor
                 apiKey="1ug1scsglfqzvtoyim5dh7pz8dx4yph03n58bxsqf5dn1gdk"
                 onInit={(evt, editor) => (editorRef.current = editor)}
-                initialValue={objectQuery.data.content}
+                initialValue={artilceForm.content}
                 init={{
-                  height: 700,
+                  height: 400,
                   width: "100%",
+                  toolbar: [
+                    "undo redo | fontsize | forecolor backcolor | styleselect | heading bold italic |" +
+                      "alignleft aligncenter alignright alignjustify | " +
+                      "bullist numlist | outdent indent | link image",
+                    "bullets prompt rephrase summarize",
+                  ],
                   menubar: true,
                   plugins:
-                    "a11ychecker advcode advlist advtable anchor autocorrect autolink autoresize autosave casechange charmap checklist code codesample directionality editimage emoticons export footnotes formatpainter fullscreen help image importcss inlinecss insertdatetime link linkchecker lists media mediaembed mentions mergetags nonbreaking pagebreak pageembed permanentpen powerpaste preview quickbars save searchreplace table tableofcontents tinydrive tinymcespellchecker typography visualblocks visualchars wordcount",
+                    "a11ychecker advcode advlist advtable anchor autocorrect autolink autoresize autosave casechange charmap checklist code codesample directionality editimage emoticons export footnotes formatpainter fullscreen help image importcss inlinecss insertdatetime link linkchecker lists media mediaembed mentions mergetags nonbreaking pagebreak pageembed permanentpen powerpaste preview quickbars save searchreplace table tableofcontents tinydrive typography visualblocks visualchars wordcount",
                   toolbar_sticky: true,
                   content_style:
                     "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                  autoresize_bottom_margin: 0,
+                  setup: (editor) => {
+                    editor.ui.registry.addButton("bullets", {
+                      text: "Create Bullets",
+                      onAction: () => {
+                        const selectedContent = editor.selection.getContent();
+                        handleAction("bullets", selectedContent).then((res) => {
+                          const { processed_text } = res;
+                          editor.execCommand(
+                            "mceReplaceContent",
+                            false,
+                            processed_text
+                          );
+                        });
+                      },
+                    });
+
+                    editor.ui.registry.addButton("prompt", {
+                      text: "Prompt",
+                      onAction: () => {
+                        const selectedContent = editor.selection.getContent();
+                        const promptProps = {
+                          text: selectedContent,
+                          callback: (res) => {
+                            editor.execCommand("mceReplaceContent", false, res);
+                          },
+                          loader: setLoading,
+                        };
+                        setpromptProps(promptProps);
+                        setPromptOpen(true);
+                      },
+                    });
+
+                    editor.ui.registry.addButton("rephrase", {
+                      text: "Rephrase",
+                      onAction: () => {
+                        const selectedContent = editor.selection.getContent();
+                        handleAction("rephrase", selectedContent).then(
+                          (res) => {
+                            const { processed_text } = res;
+                            editor.execCommand(
+                              "mceReplaceContent",
+                              false,
+                              processed_text
+                            );
+                          }
+                        );
+                      },
+                    });
+
+                    editor.ui.registry.addButton("summarize", {
+                      text: "Summarize",
+                      onAction: () => {
+                        const selectedContent = editor.selection.getContent();
+                        handleAction("summarize", selectedContent).then(
+                          (res) => {
+                            const { processed_text } = res;
+                            editor.execCommand(
+                              "mceReplaceContent",
+                              false,
+                              processed_text
+                            );
+                          }
+                        );
+                      },
+                    });
+                  },
                 }}
               />
             </Box>
@@ -171,8 +296,15 @@ const ArticleCreate = () => {
       <Drawer
         anchor="right"
         open={open}
+        disableAutoFocus
         PaperProps={{
-          sx: { width: "60%", background: "#EAECEE" },
+          sx: {
+            width: "60%",
+            background: "#EAECEE",
+            "@media (max-width: 768px)": {
+              width: "90%",
+            },
+          },
         }}
         onClose={() => setOpen((prev) => !prev)}
       >
@@ -192,7 +324,9 @@ const ArticleCreate = () => {
             <TextField
               label="Enter Keywords"
               value={search}
+              autoFocus
               name="search"
+              onKeyUp={(e) => e.key === "Enter" && searchMutation.mutate({})}
               className="flex-1"
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -215,7 +349,7 @@ const ArticleCreate = () => {
 
           <Box
             component="div"
-            className="my-5 h-96 w-full bg-pink-00 overflow-y-auto"
+            className="my-5 h-full w-full bg-pink-00 overflow-y-auto"
           >
             {searchMutation.isLoading && (
               <div className="flex items-center justify-center my-12">
@@ -241,6 +375,7 @@ const ArticleCreate = () => {
                       <ReadMore
                         description={item?.abstractText}
                         maxChars={200}
+                        handleSelect={() => addTextToEditor(item)}
                         link={`https://europepmc.org/article/MED/${item?.id}`}
                       />
                     </Box>
@@ -251,7 +386,29 @@ const ArticleCreate = () => {
           </Box>
         </Box>
       </Drawer>
+
+      <PromptModal
+        open={promptOpen}
+        setOpen={setPromptOpen}
+        promptProps={promptProps}
+      />
+      <LoadingModal open={loading} />
     </ProtectedWrapper>
+  );
+};
+
+const LoadingModal = ({ open }) => {
+  return (
+    <Modal
+      open={open}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <CircularProgress color="primary" />
+    </Modal>
   );
 };
 
