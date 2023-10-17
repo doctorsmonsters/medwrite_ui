@@ -95,7 +95,7 @@ const Article = () => {
           gap={2}
           className="flex items-end justify-between"
         >
-          <Grid item sm={12} md={10}>
+          <Grid item xs={12} md={9} className="">
             <FormControl fullWidth>
               <TextField
                 id="standard-search"
@@ -103,7 +103,6 @@ const Article = () => {
                 type="search"
                 onChange={(e) => handleSearchChange(e)}
                 variant="standard"
-                className="!rounded-full"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -115,9 +114,9 @@ const Article = () => {
               />
             </FormControl>
           </Grid>
-          <Grid item sm={12} md={2} className="flex justify-end">
+          <Grid item xs={12} md={2} className="">
             <ModalButton
-              classes=" !rounded-lg sm:w-full"
+              classes="!rounded-lg !w-full"
               text="Create"
               onClick={() => setOpen((prev) => !prev)}
               icon={<BsPlusCircle className="mr-3 text-xl" />}

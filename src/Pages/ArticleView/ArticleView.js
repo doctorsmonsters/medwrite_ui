@@ -62,11 +62,13 @@ const ArticleView = () => {
       className="copy-button"
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Share"
+      key={0}
       onClick={handleCopyClick}
     />,
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Print"
+      key={0}
       onClick={(e) => window.print()}
     />,
   ];
@@ -76,11 +78,13 @@ const ArticleView = () => {
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Edit"
+      key={0}
       onClick={() => navigate(`/articles/create/${artilceQuery.data.id}`)}
     />,
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Delete"
+      key={0}
       onClick={() => deleteMutation.mutate()}
     />,
   ];

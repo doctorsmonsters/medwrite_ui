@@ -19,5 +19,5 @@ export const clearLocalStorage = () => {
 };
 
 export function removeHTMLTags(inputText) {
-  return inputText.replace(/<[^>]*>/g, "");
+  return inputText.replace(/<[^>]*>/g, " ");
 }

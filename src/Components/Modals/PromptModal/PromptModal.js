@@ -27,34 +27,39 @@ const style = {
   },
 };
 
-const PromptModal = ({ open, setOpen, promptProps }) => {
+const PromptModal = ({ open, setOpen, promptProps, setLoading }) => {
   const [prompt, setPrompt] = React.useState("");
   const { showSuccess, showError } = useSystem();
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setLoading(false);
+  };
+
   const promptMutation = useMutation({
     mutationFn: (data) =>
       processPrompt(data)
         .then((res) => {
-          processPrompt.callback(res.data.data.processed_text);
-          showSuccess("Article Created Successfully.");
+          promptProps.callback(res.data.data);
+          setPrompt("");
+          setOpen(false);
+          showSuccess("Propmt response is added to your editor.");
         })
         .catch((error) => {
           const err = error?.response?.data || error.message;
+          console.log(error, err);
           showError(err);
         })
-        .finally(() => promptProps.loader(false)),
+        .finally(() => setLoading(false)),
   });
 
   const onClick = () => {
-    promptProps.loader(true);
     if (!prompt) return showError("Prompt may not be blank.");
+    setLoading(true);
     promptMutation.mutate({
       text: promptProps.text,
       prompt,
     });
-    setPrompt("");
-    handleClose();
   };
 
   return (

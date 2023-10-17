@@ -215,6 +215,10 @@ const ArticleCreate = () => {
                       text: "Create Bullets",
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
+                        if (!selectedContent || !selectedContent.trim())
+                          return showError(
+                            "You need to select text from the editor"
+                          );
                         handleAction("bullets", selectedContent).then((res) => {
                           const { processed_text } = res;
                           editor.execCommand(
@@ -230,14 +234,17 @@ const ArticleCreate = () => {
                       text: "Prompt",
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
+                        if (!selectedContent || !selectedContent.trim())
+                        return showError(
+                          "You need to select text from the editor"
+                        );
                         const promptProps = {
                           text: selectedContent,
                           callback: (res) => {
                             editor.execCommand("mceReplaceContent", false, res);
-                          },
-                          loader: setLoading,
+                          }
                         };
-                        setpromptProps(promptProps);
+                        setpromptProps(promptProps)
                         setPromptOpen(true);
                       },
                     });
@@ -246,6 +253,10 @@ const ArticleCreate = () => {
                       text: "Rephrase",
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
+                        if (!selectedContent || !selectedContent.trim())
+                        return showError(
+                          "You need to select text from the editor"
+                        );
                         handleAction("rephrase", selectedContent).then(
                           (res) => {
                             const { processed_text } = res;
@@ -263,6 +274,10 @@ const ArticleCreate = () => {
                       text: "Summarize",
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
+                        if (!selectedContent || !selectedContent.trim())
+                        return showError(
+                          "You need to select text from the editor"
+                        );
                         handleAction("summarize", selectedContent).then(
                           (res) => {
                             const { processed_text } = res;
@@ -333,7 +348,7 @@ const ArticleCreate = () => {
             <ModalButton
               text="search"
               classes="!rounded-sm !ml-2 !py-4"
-              disabled={!search}
+              disabled={!search || searchMutation.isLoading}
               onClick={(e) => searchMutation.mutate({})}
             />
             <ModalButton
@@ -391,6 +406,7 @@ const ArticleCreate = () => {
         open={promptOpen}
         setOpen={setPromptOpen}
         promptProps={promptProps}
+        setLoading={setLoading}
       />
       <LoadingModal open={loading} />
     </ProtectedWrapper>
@@ -407,7 +423,7 @@ const LoadingModal = ({ open }) => {
         justifyContent: "center",
       }}
     >
-      <CircularProgress color="primary" />
+      <CircularProgress className="!text-white !fill-white" />
     </Modal>
   );
 };

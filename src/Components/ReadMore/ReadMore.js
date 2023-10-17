@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Box } from "@mui/material";
 import { removeHTMLTags } from "../../Constans/Helpers";
 
-function DescriptionWithReadMore({ description, maxChars = 100, link, handleSelect }) {
+function DescriptionWithReadMore({
+  description,
+  maxChars = 100,
+  link,
+  handleSelect,
+}) {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [cleanText, setCleanText] = useState();
 
   const toggleDescription = () => {
     setShowFullDescription(!showFullDescription);
   };
+
+  useEffect(() => {
+    description && setCleanText(removeHTMLTags(description));
+  }, [description]);
 
   return (
     <Typography
@@ -15,14 +25,14 @@ function DescriptionWithReadMore({ description, maxChars = 100, link, handleSele
       component="div"
       className="text-gray-700 pb-4 font-semibold"
     >
-      {showFullDescription ? (
-        <div>{removeHTMLTags(description)}</div>
+      {!showFullDescription ? (
+        <div>{cleanText?.slice(0, maxChars)}</div>
       ) : (
-        <div>{description?.slice(0, maxChars)}</div>
+        <div>{cleanText}</div>
       )}
 
       <Box component="span" className="flex pt-4 gap-3">
-        {description?.length > maxChars && (
+        {cleanText?.length > maxChars && (
           <span
             onClick={toggleDescription}
             className="capitalize text-gray-600 font-bold cursor-pointer border-b-2 border-transparent hover:border-black"
