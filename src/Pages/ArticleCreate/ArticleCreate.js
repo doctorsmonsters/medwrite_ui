@@ -141,8 +141,8 @@ const ArticleCreate = () => {
 
   const addTextToEditor = ({ title, abstractText }) => {
     if (editorRef.current) {
-      EditorContentHandler("h", title);
-      EditorContentHandler("p", removeHTMLTags(abstractText));
+      EditorContentHandler("h", title || '');
+      EditorContentHandler("p", removeHTMLTags(abstractText || ''));
     }
     setOpen((prev) => !prev);
   };
@@ -423,7 +423,7 @@ const LoadingModal = ({ open }) => {
         justifyContent: "center",
       }}
     >
-      <CircularProgress className="!text-white !fill-white" />
+      <CircularProgress className="!text-white !fill-white !border-none !outline-none" />
     </Modal>
   );
 };

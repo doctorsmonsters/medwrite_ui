@@ -51,7 +51,7 @@ export default function PasswordChange() {
         <Box
           sx={{
             my: 8,
-            mx: 4,
+            mx: 'auto',
             display: "flex",
             flexDirection: "column",
             alignItems: "center",

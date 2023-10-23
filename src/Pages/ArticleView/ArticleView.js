@@ -123,14 +123,23 @@ const ArticleView = () => {
             </Box>
 
             <Box className="py-12 px-8 bg-light">
-              <Typography component="h2" variant="h4" className="pb-5">
+              <Typography component="h2" variant="h4" className="pb-10">
                 {artilceQuery.data.title}
               </Typography>
-
               <Box
-                compoenent="div"
+                component="div"
                 className=""
-                dangerouslySetInnerHTML={{ __html: artilceQuery.data.content }}
+                dangerouslySetInnerHTML={{
+                  __html: `
+                      <style>
+                        ul {
+                          list-style-type: disc;
+                          margin-left: 20px
+                        }
+                      </style>
+                      ${artilceQuery.data.content}
+                    `,
+                }}
               />
             </Box>
           </Box>

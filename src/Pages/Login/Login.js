@@ -126,7 +126,7 @@ export default function Login() {
               autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value="remember" color="primary" name="remember" />}
               label="Remember me"
             />
             <br />

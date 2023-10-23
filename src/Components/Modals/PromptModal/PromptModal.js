@@ -5,7 +5,7 @@ import {
   Typography,
   Box,
   Modal,
-  TextareaAutosize,
+  TextField,
 } from "@mui/material";
 import { AiOutlineClose } from "react-icons/ai";
 import { processPrompt } from "../../../Services/Actions.service";
@@ -98,14 +98,14 @@ const PromptModal = ({ open, setOpen, promptProps, setLoading }) => {
             }}
           >
             <FormControl fullWidth>
-              <TextareaAutosize
+              <TextField
                 autoFocus
+                multiline
                 margin="normal"
                 required
                 className="!border-black !border-2 p-5"
                 placeholder="Enter your Prompt"
                 id="title"
-                onKeyUp={(e) => e.key === "Enter" && onClick()}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 label="Enter Prompt"
@@ -125,8 +125,8 @@ const PromptModal = ({ open, setOpen, promptProps, setLoading }) => {
             <CircularButton
               type="button"
               text="Generate"
+              disabled={!prompt}
               onClick={onClick}
-              loading={promptMutation.isLoading}
             />
           </Box>
         </Box>
