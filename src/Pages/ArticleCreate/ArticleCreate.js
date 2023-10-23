@@ -16,6 +16,7 @@ import {
   searchDatabases,
   updateArticle,
 } from "../../Services/Article.service";
+import { TINYMCE_API_KEY } from "../../Constans/Api";
 import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
 import { removeHTMLTags } from "../../Constans/Helpers";
@@ -84,7 +85,6 @@ const ArticleCreate = () => {
     mutationFn: (data) =>
       searchDatabases({ query: search, cursor: 0, ...data })
         .then((res) => {
-          console.log(res.data);
           return res.data.data;
         })
         .catch((error) => {
@@ -191,7 +191,7 @@ const ArticleCreate = () => {
 
             <Box component="div" className="my-4" id="editor">
               <Editor
-                apiKey="1ug1scsglfqzvtoyim5dh7pz8dx4yph03n58bxsqf5dn1gdk"
+                apiKey={TINYMCE_API_KEY}
                 onInit={(evt, editor) => (editorRef.current = editor)}
                 initialValue={artilceForm.content}
                 init={{

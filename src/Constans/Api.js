@@ -1,7 +1,7 @@
 export const API_BASE_URL = "http://localhost:8000/api";
 export const GOOGLE_CLIENT_ID =
-  "529251858488-17f6bihuopf9c1htvq3gjp9921uljo0e.apps.googleusercontent.com";
-
+  "945970413385-d8a3jbt748cinsr54k0klctnrfgkno5h.apps.googleusercontent.com";
+export const TINYMCE_API_KEY = "gef8xiyvs164fqxpstv7gkqlfzzfveno0wbcqld4etd71mkd"
 export const getAxiosConfig = () => {
   const authToken = localStorage.getItem("userToken");
   return {
@@ -11,3 +11,4 @@ export const getAxiosConfig = () => {
     },
   };
 };
+
