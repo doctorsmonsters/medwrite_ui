@@ -17,8 +17,8 @@ export const ARTICLE_TABLE_COLUMNS = [
     renderCell: (params) => formatSemanticDate(params.value),
   },
   {
-    field: "Updated_at",
-    headerName: "Update At",
+    field: "updated_at",
+    headerName: "Updated At",
     width: 300,
     renderCell: (params) => {
       if (!params.value) return "_";

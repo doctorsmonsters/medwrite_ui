@@ -53,7 +53,7 @@ function DescriptionWithReadMore({
           onClick={handleSelect}
           className="capitalize text-gray-600 font-bold cursor-pointer border-b-2 border-transparent hover:border-black"
         >
-          Select
+          Refer to this
         </span>
       </Box>
     </Typography>

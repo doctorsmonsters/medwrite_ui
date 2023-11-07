@@ -1,7 +1,6 @@
-// personal backend url
-// export const API_BASE_URL = "https://medwriter-backend.vercel.app/api";
-// export const API_BASE_URL = "http://localhost:8000/api";
-export const API_BASE_URL = "https://medwriter.vercel.app/api"
+// export const API_BASE_URL = "http://localhost:8000/api"; // dev
+export const API_BASE_URL = "https://medwriter-backend.vercel.app/api"; // personal
+// export const API_BASE_URL = "https://medwriter.vercel.app/api" // client
 
 
 export const GOOGLE_CLIENT_ID =
@@ -17,3 +16,8 @@ export const getAxiosConfig = () => {
   };
 };
 
+
+// PRO PLUGINS OF TINYMCE
+// a11ychecker advcode advtable autocorrect casechange mediaembed
+// mentions pageembed permanentpen powerpaste mergetags checklist
+// editimage export typography footnotes formatpainter inlinecss tableofcontents

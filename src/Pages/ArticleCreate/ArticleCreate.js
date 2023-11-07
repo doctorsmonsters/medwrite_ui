@@ -16,6 +16,7 @@ import {
   searchDatabases,
   updateArticle,
 } from "../../Services/Article.service";
+import { createReference } from "../../Services/Reference.service";
 import { TINYMCE_API_KEY } from "../../Constans/Api";
 import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
@@ -34,7 +35,9 @@ const ArticleCreate = () => {
   const params = useParams();
   const navigate = useNavigate();
   const uuid = params.uuid;
-  const { showError } = useSystem();
+  let autoSaveTimer;
+  const inactivityPeriod = 30000;
+  const { showError, showSuccess } = useSystem();
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -47,6 +50,33 @@ const ArticleCreate = () => {
 
   const editorRef = React.useRef(null);
 
+  // Hooks
+  React.useEffect(() => {
+    // Autosave when action is followed by inaction.
+    if (editorRef.current) {
+      const handleKeyDown = () => {
+        if (autoSaveTimer) {
+          clearTimeout(autoSaveTimer);
+        }
+        autoSaveTimer = setTimeout(() => {
+          updateArticle(uuid, {
+            ...artilceForm,
+            content: editorRef.current.getContent(),
+          })
+            .then((res) => showSuccess("Content Auto Saved."))
+            .catch((error) => {
+              const err = error?.response?.data || error.message;
+              showError(err);
+            });
+        }, inactivityPeriod);
+      };
+
+      editorRef.current.on("keydown", handleKeyDown);
+      return () => editorRef.current.off("keydown", handleKeyDown);
+    }
+  }, [editorRef.current]);
+
+  // Quiries & Mutations
   const objectQuery = useQuery({
     queryFn: () =>
       getArticleById(uuid)
@@ -97,6 +127,19 @@ const ArticleCreate = () => {
     },
   });
 
+  const referenceMutation = useMutation({
+    mutationFn: (data) =>
+      createReference(data)
+        .then((res) => {
+          return res.data.data;
+        })
+        .catch((error) => {
+          const err = error?.response?.data || error.message;
+          showError(err);
+        }),
+  });
+
+  // handlers
   const handleAction = async (type, content) => {
     setLoading(true);
     const params = {
@@ -113,7 +156,6 @@ const ArticleCreate = () => {
       .finally(() => setLoading(false));
   };
 
-  // handlers
   const handleArticleForm = ({ target: { name, value } }) => {
     setArticleForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -139,12 +181,11 @@ const ArticleCreate = () => {
     }
   };
 
-  const addTextToEditor = ({ title, abstractText }) => {
+  const addTextToEditor = ({ abstractText }) => {
     if (editorRef.current) {
-      EditorContentHandler("h", title || '');
-      EditorContentHandler("p", removeHTMLTags(abstractText || ''));
+      EditorContentHandler("p", removeHTMLTags(abstractText || ""));
     }
-    setOpen((prev) => !prev);
+    // setOpen((prev) => !prev);
   };
 
   return (
@@ -205,7 +246,7 @@ const ArticleCreate = () => {
                   ],
                   menubar: true,
                   plugins:
-                    "a11ychecker advcode advlist advtable anchor autocorrect autolink autoresize autosave casechange charmap checklist code codesample directionality editimage emoticons export footnotes formatpainter fullscreen help image importcss inlinecss insertdatetime link linkchecker lists media mediaembed mentions mergetags nonbreaking pagebreak pageembed permanentpen powerpaste preview quickbars save searchreplace table tableofcontents tinydrive typography visualblocks visualchars wordcount",
+                    "advlist anchor autolink autoresize autosave charmap code codesample directionality emoticons fullscreen help image importcss insertdatetime link linkchecker lists media nonbreaking pagebreak preview quickbars save searchreplace table tinydrive visualblocks visualchars wordcount",
                   toolbar_sticky: true,
                   content_style:
                     "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
@@ -235,16 +276,16 @@ const ArticleCreate = () => {
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
                         if (!selectedContent || !selectedContent.trim())
-                        return showError(
-                          "You need to select text from the editor"
-                        );
+                          return showError(
+                            "You need to select text from the editor"
+                          );
                         const promptProps = {
                           text: selectedContent,
                           callback: (res) => {
                             editor.execCommand("mceReplaceContent", false, res);
-                          }
+                          },
                         };
-                        setpromptProps(promptProps)
+                        setpromptProps(promptProps);
                         setPromptOpen(true);
                       },
                     });
@@ -254,9 +295,9 @@ const ArticleCreate = () => {
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
                         if (!selectedContent || !selectedContent.trim())
-                        return showError(
-                          "You need to select text from the editor"
-                        );
+                          return showError(
+                            "You need to select text from the editor"
+                          );
                         handleAction("rephrase", selectedContent).then(
                           (res) => {
                             const { processed_text } = res;
@@ -275,9 +316,9 @@ const ArticleCreate = () => {
                       onAction: () => {
                         const selectedContent = editor.selection.getContent();
                         if (!selectedContent || !selectedContent.trim())
-                        return showError(
-                          "You need to select text from the editor"
-                        );
+                          return showError(
+                            "You need to select text from the editor"
+                          );
                         handleAction("summarize", selectedContent).then(
                           (res) => {
                             const { processed_text } = res;

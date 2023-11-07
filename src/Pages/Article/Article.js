@@ -132,12 +132,12 @@ const Article = () => {
             </p>
           )}
           {articleQuery.isLoading && <Loading />}
-          {!articleQuery.isLoading && (
+          {articleQuery.isSuccess && (
             <Table
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
               style={{ height: "inherit" }}
-              data={searchFilter || articleQuery.data}
+              data={searchFilter || articleQuery.data || []}
               columns={ARTICLE_TABLE_COLUMNS}
               onDeleteClick={() => setOpenDrawer(true)}
             />

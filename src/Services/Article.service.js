@@ -3,7 +3,7 @@ import axios from "./Axios.Instance";
 
 export const getArticles = () => {
   const config = getAxiosConfig();
-  return axios.get("/article", config);
+  return axios.get("/article/", config);
 };
 
 export const createArticle = (data) => {

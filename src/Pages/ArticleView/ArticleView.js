@@ -68,7 +68,7 @@ const ArticleView = () => {
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Print"
-      key={0}
+      key={1}
       onClick={(e) => window.print()}
     />,
   ];
@@ -78,13 +78,13 @@ const ArticleView = () => {
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Edit"
-      key={0}
+      key={2}
       onClick={() => navigate(`/articles/create/${artilceQuery.data.id}`)}
     />,
     <ModalButton
       classes="!bg-white !text-black !py-1 !px-5 !rounded-full !font-semibold !tracking-wider"
       text="Delete"
-      key={0}
+      key={3}
       onClick={() => deleteMutation.mutate()}
     />,
   ];
