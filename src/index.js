@@ -30,6 +30,9 @@ const theme = createTheme({
     feature: {
       main: "#00231f",
     },
+    green: {
+      main: "#00231f"
+    }
   },
 });
 

@@ -1,5 +1,5 @@
-// export const API_BASE_URL = "http://localhost:8000/api"; // dev
-export const API_BASE_URL = "https://medwriter-backend.vercel.app/api"; // personal
+export const API_BASE_URL = "http://localhost:8000/api"; // dev
+// export const API_BASE_URL = "https://medwriter-backend.vercel.app/api"; // personal
 // export const API_BASE_URL = "https://medwriter.vercel.app/api" // client
 
 

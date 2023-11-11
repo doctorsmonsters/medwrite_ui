@@ -2,33 +2,23 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Box,
-  Typography,
-  TextField,
-  Drawer,
-  CircularProgress,
-  Modal,
-} from "@mui/material";
+import { Box, Typography, TextField } from "@mui/material";
 import { BiSearchAlt } from "react-icons/bi";
-import {
-  getArticleById,
-  searchDatabases,
-  updateArticle,
-} from "../../Services/Article.service";
-import { createReference } from "../../Services/Reference.service";
+import { getArticleById, updateArticle } from "../../Services/Article.service";
 import { TINYMCE_API_KEY } from "../../Constans/Api";
 import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
 import { removeHTMLTags } from "../../Constans/Helpers";
 import PromptModal from "../../Components/Modals/PromptModal";
+import LoadingModal from "../../Components/Modals/LoadingModal";
 import Loading from "../../Components/Loading";
+import SearchDrawer from "../../Components/Drawer/SearchDrawer/SearchDrawer";
 import Header from "../../Components/Header";
-import ReadMore from "../../Components/ReadMore";
 import useSystem from "../../Hooks/useSystem";
 import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
 import CircularButton from "../../Components/Buttons/CircularButton/CircularButton";
 import ModalButton from "../../Components/Buttons/ModalButton";
+import ReferenceDrawer from "../../Components/Drawer/ReferenceDrawer/ReferenceDrawer";
 
 const ArticleCreate = () => {
   const queryClient = useQueryClient();
@@ -36,13 +26,14 @@ const ArticleCreate = () => {
   const navigate = useNavigate();
   const uuid = params.uuid;
   let autoSaveTimer;
-  const inactivityPeriod = 30000;
+  const inactivityPeriod = 10000;
   const { showError, showSuccess } = useSystem();
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [promptProps, setpromptProps] = React.useState({});
   const [promptOpen, setPromptOpen] = React.useState(false);
+  const [refOpen, setRefOpen] = React.useState(false);
   const [artilceForm, setArticleForm] = React.useState({
     title: "",
     content: "",
@@ -63,7 +54,7 @@ const ArticleCreate = () => {
             ...artilceForm,
             content: editorRef.current.getContent(),
           })
-            .then((res) => showSuccess("Content Auto Saved."))
+            .then(() => showSuccess("Content Auto Saved."))
             .catch((error) => {
               const err = error?.response?.data || error.message;
               showError(err);
@@ -111,34 +102,6 @@ const ArticleCreate = () => {
     },
   });
 
-  const searchMutation = useMutation({
-    mutationFn: (data) =>
-      searchDatabases({ query: search, cursor: 0, ...data })
-        .then((res) => {
-          return res.data.data;
-        })
-        .catch((error) => {
-          const err = error?.response?.data || error.message;
-          showError(err);
-        }),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries([]);
-    },
-  });
-
-  const referenceMutation = useMutation({
-    mutationFn: (data) =>
-      createReference(data)
-        .then((res) => {
-          return res.data.data;
-        })
-        .catch((error) => {
-          const err = error?.response?.data || error.message;
-          showError(err);
-        }),
-  });
-
   // handlers
   const handleAction = async (type, content) => {
     setLoading(true);
@@ -181,18 +144,17 @@ const ArticleCreate = () => {
     }
   };
 
-  const addTextToEditor = ({ abstractText }) => {
+  const addTextToEditor = (text) => {
     if (editorRef.current) {
-      EditorContentHandler("p", removeHTMLTags(abstractText || ""));
+      EditorContentHandler("p", removeHTMLTags(text || ""));
     }
-    // setOpen((prev) => !prev);
   };
 
   return (
     <ProtectedWrapper>
       <Header isConcise={true} />
       <Box component="main" py={7} className="px-6 md:px-10">
-        <Box mb={3}>
+        <Box>
           <div className="flex items-center">
             <div
               className="p-1 rounded-md bg-green-dark mr-3 cursor-pointer"
@@ -210,6 +172,15 @@ const ArticleCreate = () => {
           </Typography>
         </Box>
 
+        <Box component="div" className="flex justify-end my-0">
+          <ModalButton
+            text="References"
+            classes="!rounded-md !px-10 !py-2"
+            badge={true}
+            onClick={() => setRefOpen((prev) => !prev)}
+          />
+        </Box>
+
         {objectQuery.isLoading && (
           <div className="flex items-center justify-center my-32">
             <Loading />
@@ -217,7 +188,7 @@ const ArticleCreate = () => {
         )}
 
         {objectQuery.isSuccess && (
-          <Box className="my-12">
+          <Box className="my-5">
             <Box className="editor py-3">
               <TextField
                 required
@@ -349,123 +320,23 @@ const ArticleCreate = () => {
         )}
       </Box>
 
-      <Drawer
-        anchor="right"
-        open={open}
-        disableAutoFocus
-        PaperProps={{
-          sx: {
-            width: "60%",
-            background: "#EAECEE",
-            "@media (max-width: 768px)": {
-              width: "90%",
-            },
-          },
-        }}
-        onClose={() => setOpen((prev) => !prev)}
-      >
-        <Box sx={{ px: 5, py: 8 }} color="white" height="100%">
-          <Typography
-            variant="h4"
-            component="h5"
-            className="text-black pb-4 border-b-2 border-black"
-          >
-            Search PubMed
-          </Typography>
-          <Box
-            component="div"
-            className="flex justify-between items-center bg-red-00"
-            mt={2}
-          >
-            <TextField
-              label="Enter Keywords"
-              value={search}
-              autoFocus
-              name="search"
-              onKeyUp={(e) => e.key === "Enter" && searchMutation.mutate({})}
-              className="flex-1"
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <ModalButton
-              text="search"
-              classes="!rounded-sm !ml-2 !py-4"
-              disabled={!search || searchMutation.isLoading}
-              onClick={(e) => searchMutation.mutate({})}
-            />
-            <ModalButton
-              text="Explore"
-              classes="!rounded-sm !ml-2 !py-4"
-              disabled={searchMutation.isLoading}
-              onClick={(e) => {
-                setSearch("");
-                searchMutation.mutate({ query: "*" });
-              }}
-            />
-          </Box>
-
-          <Box
-            component="div"
-            className="my-5 h-full w-full bg-pink-00 overflow-y-auto"
-          >
-            {searchMutation.isLoading && (
-              <div className="flex items-center justify-center my-12">
-                <Loading />
-              </div>
-            )}
-            {searchMutation.isSuccess && (
-              <>
-                {searchMutation.data?.resultList?.result?.map((item, index) => {
-                  return (
-                    <Box
-                      component="div"
-                      className="p-3 mx-2 my-3 bg-[#f9f9f9] rounded-md"
-                      key={index}
-                    >
-                      <Typography
-                        variant="body1"
-                        component="h5"
-                        className="text-black py-2 font-semibold"
-                      >
-                        {item?.title}
-                      </Typography>
-                      <ReadMore
-                        description={item?.abstractText}
-                        maxChars={200}
-                        handleSelect={() => addTextToEditor(item)}
-                        link={`https://europepmc.org/article/MED/${item?.id}`}
-                      />
-                    </Box>
-                  );
-                })}
-              </>
-            )}
-          </Box>
-        </Box>
-      </Drawer>
-
       <PromptModal
         open={promptOpen}
         setOpen={setPromptOpen}
         promptProps={promptProps}
         setLoading={setLoading}
       />
+      <SearchDrawer
+        search={search}
+        setSearch={setSearch}
+        open={open}
+        setOpen={setOpen}
+        article={uuid}
+        addTextToEditor={addTextToEditor}
+      />
+      <ReferenceDrawer open={refOpen} setOpen={setRefOpen} article={uuid} />
       <LoadingModal open={loading} />
     </ProtectedWrapper>
-  );
-};
-
-const LoadingModal = ({ open }) => {
-  return (
-    <Modal
-      open={open}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <CircularProgress className="!text-white !fill-white !border-none !outline-none" />
-    </Modal>
   );
 };
 

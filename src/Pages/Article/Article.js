@@ -6,12 +6,9 @@ import {
   TextField,
   Box,
   Typography,
-  Grid,
-  Drawer,
-  List,
-  ListItem,
+  Grid
 } from "@mui/material";
-import { BiSearchAlt, BiSolidRightArrow } from "react-icons/bi";
+import { BiSearchAlt } from "react-icons/bi";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdArticle } from "react-icons/md";
 import { ARTICLE_TABLE_COLUMNS } from "../../Constans/MetaData";
@@ -22,7 +19,7 @@ import Loading from "../../Components/Loading";
 import ModalButton from "../../Components/Buttons/ModalButton";
 import ArticleModal from "../../Components/Modals/ArticleModal";
 import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
-import CircularButton from "../../Components/Buttons/CircularButton/CircularButton";
+import DeleteDrawer from "../../Components/Drawer/DeleteDrawer/DeleteDrawer";
 import useSystem from "../../Hooks/useSystem";
 
 const Article = () => {
@@ -144,54 +141,17 @@ const Article = () => {
           )}
         </Box>
       </Box>
+
+      {/* Componenets */}
       <ArticleModal open={open} setOpen={setOpen} />
       {openDrawer && (
-        <Drawer
-          anchor="right"
-          open={openDrawer}
-          onClose={() => setOpenDrawer((prev) => !prev)}
-        >
-          <Box
-            sx={{ px: 5, py: 8 }}
-            className="text-charcol "
-            color=""
-            height="100%"
-          >
-            <Typography component="p" variant="body1">
-              Do you want to Delete the following Articles?
-            </Typography>
-
-            <List className="!my-5">
-              {selectedRows.map((item, index) => (
-                <ListItem key={index} className="!px-0 !mx-0">
-                  <div className="flex gap-x-3 items-center">
-                    <BiSolidRightArrow />
-                    {item.title}
-                  </div>
-                </ListItem>
-              ))}
-            </List>
-
-            <Box className="flex gap-x-3 py-5 justify-end">
-              <ModalButton
-                onClick={handleClose}
-                text="Cancel"
-                classes="!font-sm !px-0 !bg-transparent !shadow-none !text-black"
-              />
-              <CircularButton
-                text="Confirm"
-                classes="!w-max !px-5"
-                loading={deleteMutation.isLoading}
-                disabled={deleteMutation.isLoading}
-                onClick={() =>
-                  deleteMutation.mutate({
-                    article_ids: [...selectedRows.map((item) => item.id)],
-                  })
-                }
-              />
-            </Box>
-          </Box>
-        </Drawer>
+        <DeleteDrawer
+          openDrawer={openDrawer}
+          setOpenDrawer={setOpenDrawer}
+          selectedRows={selectedRows}
+          handleClose={handleClose}
+          deleteMutation={deleteMutation}
+        />
       )}
     </ProtectedWrapper>
   );

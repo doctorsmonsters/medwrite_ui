@@ -3,11 +3,14 @@ import { Typography, Box } from "@mui/material";
 import { removeHTMLTags } from "../../Constans/Helpers";
 
 function DescriptionWithReadMore({
-  description,
-  maxChars = 100,
-  link,
+  item,
+  maxChars = 200,
+  article,
   handleSelect,
+  setRefIndex
 }) {
+  const { title, abstractText, pmcid } = item;
+  const link = `https://europepmc.org/article/MED/${item?.id}`
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [cleanText, setCleanText] = useState();
 
@@ -16,8 +19,21 @@ function DescriptionWithReadMore({
   };
 
   useEffect(() => {
-    description && setCleanText(removeHTMLTags(description));
-  }, [description]);
+    abstractText && setCleanText(removeHTMLTags(abstractText));
+  }, [abstractText]);
+
+  const handleReference = () => {
+    setRefIndex()
+    const data = {
+      title,
+      article,
+      pmc_id: pmcid,
+      link,
+      abstract_text: abstractText
+    }
+    handleSelect(data)
+
+  }
 
   return (
     <Typography
@@ -50,7 +66,7 @@ function DescriptionWithReadMore({
         </a>
 
         <span
-          onClick={handleSelect}
+          onClick={handleReference}
           className="capitalize text-gray-600 font-bold cursor-pointer border-b-2 border-transparent hover:border-black"
         >
           Refer to this
