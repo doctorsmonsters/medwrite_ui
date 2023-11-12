@@ -10,3 +10,9 @@ export const getReferences = (params) => {
   const config = getAxiosConfig();
   return axios.get("/reference/", { params: { ...params }, ...config });
 };
+
+
+export const deleteReferences = (params) => {
+  const config = getAxiosConfig();
+  return axios.delete("/reference/" + params, { ...config });
+};

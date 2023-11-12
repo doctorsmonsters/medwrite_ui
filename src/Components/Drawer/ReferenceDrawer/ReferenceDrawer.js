@@ -1,13 +1,30 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getReferences } from "../../../Services/Reference.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteReferences, getReferences } from "../../../Services/Reference.service";
 import { Drawer, Box, Typography } from "@mui/material";
 import Loading from "../../../Components/Loading";
 import { removeHTMLTags } from "../../../Constans/Helpers";
 
 const ReferenceDrawer = ({ open, setOpen, article }) => {
+  const [showFullDescription, setShowFullDescription] = React.useState(null)
+
+  const toggleDescription = (index) => {
+    setShowFullDescription(showFullDescription === index ? null : index)
+  }
+
+  const deleteDiscriptionMutation = useMutation({
+    mutationFn: (data) =>
+      deleteReferences(data)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((error) => {
+          return error
+        }),
+  });
+
   const referenceQuery = useQuery({
-    queryKey: ["references"],
+    queryKey: ["references", deleteDiscriptionMutation.data],
     queryFn: () =>
       getReferences({ article_id: article }).then((res) => res.data.data),
   });
@@ -15,9 +32,9 @@ const ReferenceDrawer = ({ open, setOpen, article }) => {
   return (
     <Drawer
       anchor="right"
-      open={open}
+      open={ open }
       disableAutoFocus
-      PaperProps={{
+      PaperProps={ {
         sx: {
           width: "60%",
           background: "#EAECEE",
@@ -25,10 +42,10 @@ const ReferenceDrawer = ({ open, setOpen, article }) => {
             width: "90%",
           },
         },
-      }}
-      onClose={() => setOpen((prev) => !prev)}
+      } }
+      onClose={ () => setOpen((prev) => !prev) }
     >
-      <Box sx={{ px: 5, py: 8 }} color="white" height="100%">
+      <Box sx={ { px: 5, py: 8 } } color="white" height="100%">
         <Typography
           variant="h4"
           component="h5"
@@ -41,40 +58,60 @@ const ReferenceDrawer = ({ open, setOpen, article }) => {
           component="div"
           className="my-5 h-full w-full bg-pink-00 overflow-y-auto"
         >
-          {referenceQuery.isLoading && (
+          { referenceQuery.isLoading && (
             <div className="flex items-center justify-center my-12">
               <Loading />
             </div>
-          )}
-          {referenceQuery.isSuccess && (
+          ) }
+          { referenceQuery.isSuccess && (
             <>
-              {referenceQuery.data.map((item, index) => {
+              { referenceQuery.data.map((item, index) => {
+                const { abstract_text, title, id } = item
+                const abstractText = removeHTMLTags(abstract_text)
+                const abstractTextRefactored = abstractText.slice(0, 200);
                 return (
                   <Box
                     component="div"
                     className="p-3 mx-2 my-3 bg-[#f9f9f9] rounded-md relative"
-                    key={index}
+                    key={ index }
                   >
                     <Typography
                       variant="body1"
                       component="h5"
                       className="text-black py-2 font-semibold"
                     >
-                      {item?.title}
+                      { title }
                     </Typography>
 
-                    <span
-                      // onClick={toggleDescription}
-                      className="capitalize text-gray-600"
+                    <div
+                      className="capitalize text-gray-600 mb-5"
                     >
-                      {/* {showFullDescription ? "Read Less" : "Read More"} */}
-                      {removeHTMLTags(item.abstract_text)}
-                    </span>
+                      { showFullDescription !== index ? abstractTextRefactored + ". . ." : abstractText }
+                      <span
+                        className=" absolute right-0 bottom-0 cursor-pointer bg-black rounded-tl-md rounded-br-md text-sm hover:bg-gray-600 px-2 py-1 text-white"
+                        onClick={ () => toggleDescription(index) }
+                      >
+
+                        { showFullDescription === index ? "Read Less" : "Read More" }
+                      </span>
+                      <span
+                        className=" absolute right-[5.5rem] bottom-0 cursor-pointer bg-black rounded-t-md  text-sm px-2 py-1 hover:bg-gray-600  text-white"
+                        onClick={ () => deleteDiscriptionMutation.mutate(id) }
+                      >
+                        Delete
+                      </span>
+
+                    </div>
+                    { deleteDiscriptionMutation.isLoading && (
+                      <div className="flex items-center justify-center my-12">
+                        <Loading />
+                      </div>
+                    ) }
                   </Box>
                 );
-              })}
+              }) }
             </>
-          )}
+          ) }
         </Box>
       </Box>
     </Drawer>
