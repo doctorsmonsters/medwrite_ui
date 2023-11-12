@@ -8,7 +8,11 @@ import { getArticleById, updateArticle } from "../../Services/Article.service";
 import { TINYMCE_API_KEY } from "../../Constans/Api";
 import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
-import { removeHTMLTags } from "../../Constans/Helpers";
+import {
+  referenceMaker,
+  referenceStyles,
+  removeHTMLTags,
+} from "../../Constans/Helpers";
 import PromptModal from "../../Components/Modals/PromptModal";
 import LoadingModal from "../../Components/Modals/LoadingModal";
 import Loading from "../../Components/Loading";
@@ -19,6 +23,7 @@ import ProtectedWrapper from "../../Components/Wrapper/ProtectedWrapper";
 import CircularButton from "../../Components/Buttons/CircularButton/CircularButton";
 import ModalButton from "../../Components/Buttons/ModalButton";
 import ReferenceDrawer from "../../Components/Drawer/ReferenceDrawer/ReferenceDrawer";
+import ReferenceStyleModal from "../../Components/Modals/ReferenceStyleModal";
 
 const ArticleCreate = () => {
   const queryClient = useQueryClient();
@@ -33,7 +38,10 @@ const ArticleCreate = () => {
   const [search, setSearch] = React.useState("");
   const [promptProps, setpromptProps] = React.useState({});
   const [promptOpen, setPromptOpen] = React.useState(false);
+  const [refs, setRefs] = React.useState([]);
   const [refOpen, setRefOpen] = React.useState(false);
+  const [selectedStyle, setSelectedStyle] = React.useState(referenceStyles[2]);
+  const [refStyleOpen, setRefStyleOpen] = React.useState(false);
   const [artilceForm, setArticleForm] = React.useState({
     title: "",
     content: "",
@@ -123,6 +131,14 @@ const ArticleCreate = () => {
     setArticleForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSave = () => {
+    const _refrences = refs
+      .map((i) => referenceMaker(selectedStyle?.name, i))
+      .join("<br />");
+    EditorContentHandler("", _refrences);
+    objectMutation.mutate();
+  };
+
   const EditorContentHandler = (type, data) => {
     switch (type) {
       case "h":
@@ -138,6 +154,9 @@ const ArticleCreate = () => {
           false,
           `<p>${data}</p>`
         );
+        break;
+      case "":
+        editorRef.current.execCommand("mceInsertContent", false, data);
         break;
       default:
         break;
@@ -177,6 +196,7 @@ const ArticleCreate = () => {
             text="References"
             classes="!rounded-md !px-10 !py-2"
             badge={true}
+            badgeCount={refs?.length || 0}
             onClick={() => setRefOpen((prev) => !prev)}
           />
         </Box>
@@ -313,7 +333,7 @@ const ArticleCreate = () => {
                 disabled={!artilceForm.title || !artilceForm.content}
                 classes="!px-10 !w-max"
                 loading={objectMutation.isLoading}
-                onClick={() => objectMutation.mutate()}
+                onClick={handleSave}
               />
             </Box>
           </Box>
@@ -334,7 +354,19 @@ const ArticleCreate = () => {
         article={uuid}
         addTextToEditor={addTextToEditor}
       />
-      <ReferenceDrawer open={refOpen} setOpen={setRefOpen} article={uuid} />
+      <ReferenceDrawer
+        open={refOpen}
+        setOpen={setRefOpen}
+        article={uuid}
+        setRefStyleOpen={setRefStyleOpen}
+        setRefs={setRefs}
+      />
+      <ReferenceStyleModal
+        open={refStyleOpen}
+        handleClose={() => setRefStyleOpen((prev) => !prev)}
+        selectedStyle={selectedStyle}
+        setSelectedStyle={setSelectedStyle}
+      />
       <LoadingModal open={loading} />
     </ProtectedWrapper>
   );

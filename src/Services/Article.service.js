@@ -17,7 +17,7 @@ export const bulkDelete = (data) => {
 };
 
 export const getArticleById = (uuid) => {
-  return axios.get(`/article/${uuid}`);
+  return axios.get(`/article/${uuid}/`);
 };
 
 export const deleteArticle = (uuid) => {

@@ -2,14 +2,24 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getReferences } from "../../../Services/Reference.service";
 import { Drawer, Box, Typography } from "@mui/material";
-import Loading from "../../../Components/Loading";
+import { MdOutlineStyle } from "react-icons/md";
 import { removeHTMLTags } from "../../../Constans/Helpers";
+import Loading from "../../../Components/Loading";
 
-const ReferenceDrawer = ({ open, setOpen, article }) => {
+const ReferenceDrawer = ({
+  open,
+  setOpen,
+  article,
+  setRefStyleOpen,
+  setRefs,
+}) => {
   const referenceQuery = useQuery({
     queryKey: ["references"],
     queryFn: () =>
-      getReferences({ article_id: article }).then((res) => res.data.data),
+      getReferences({ article_id: article }).then((res) => {
+        setRefs(res.data.data);
+        return res.data.data;
+      }),
   });
 
   return (
@@ -32,9 +42,15 @@ const ReferenceDrawer = ({ open, setOpen, article }) => {
         <Typography
           variant="h4"
           component="h5"
-          className="text-black pb-4 border-b-2 border-black"
+          className="text-black pb-4 border-b-2 border-black flex justify-between"
         >
           Article's Reference
+          <span>
+            <MdOutlineStyle
+              className="cursor-pointer"
+              onClick={() => setRefStyleOpen(true)}
+            />
+          </span>
         </Typography>
 
         <Box

@@ -7,10 +7,19 @@ function DescriptionWithReadMore({
   maxChars = 200,
   article,
   handleSelect,
-  setRefIndex
+  setRefIndex,
 }) {
-  const { title, abstractText, pmcid } = item;
-  const link = `https://europepmc.org/article/MED/${item?.id}`
+  const {
+    title,
+    abstractText,
+    pmcid,
+    authorString,
+    authorList,
+    journalInfo,
+    firstPublicationDate,
+    source,
+  } = item;
+  const link = `https://europepmc.org/article/MED/${item?.id}`;
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [cleanText, setCleanText] = useState();
 
@@ -23,17 +32,24 @@ function DescriptionWithReadMore({
   }, [abstractText]);
 
   const handleReference = () => {
-    setRefIndex()
+    setRefIndex();
     const data = {
       title,
       article,
       pmc_id: pmcid,
       link,
-      abstract_text: abstractText
-    }
-    handleSelect(data)
-
-  }
+      abstract_text: abstractText,
+      configurations: {
+        authorString,
+        authorList,
+        journalInfo,
+        firstPublicationDate,
+        source,
+        link,
+      },
+    };
+    handleSelect(data);
+  };
 
   return (
     <Typography

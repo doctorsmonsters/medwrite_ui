@@ -41,13 +41,15 @@ const SearchDrawer = ({
       createReference(data)
         .then((res) => {
           showSuccess("Reference has been added successfully.");
-          addTextToEditor(res.data.abstract_text)
           return res.data;
         })
         .catch((error) => {
           const err = error?.response?.data || error.message;
           showError(err);
         }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["references"]);
+    },
   });
 
   return (
