@@ -1,6 +1,9 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getReferences } from "../../../Services/Reference.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteReferences,
+  getReferences,
+} from "../../../Services/Reference.service";
 import { Drawer, Box, Typography } from "@mui/material";
 import { MdOutlineStyle } from "react-icons/md";
 import { removeHTMLTags } from "../../../Constans/Helpers";
@@ -13,8 +16,33 @@ const ReferenceDrawer = ({
   setRefStyleOpen,
   setRefs,
 }) => {
+  const [showFullDescription, setShowFullDescription] = React.useState(null);
+  const [deletingReferenceindex, setdeletingReferenceindex] =
+    React.useState(null);
+
+  const toggleDescription = (index) => {
+    setShowFullDescription(showFullDescription === index ? null : index);
+  };
+
+  const deleteReference = (id, index) => {
+    setdeletingReferenceindex(index);
+    deleteReferenceMutation.mutate(id);
+  };
+
+  const deleteReferenceMutation = useMutation({
+    mutationFn: (data) =>
+      deleteReferences(data)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((error) => {
+          return error;
+        })
+        .finally(() => setdeletingReferenceindex(null)),
+  });
+
   const referenceQuery = useQuery({
-    queryKey: ["references"],
+    queryKey: ["references", deleteReferenceMutation.isSuccess],
     queryFn: () =>
       getReferences({ article_id: article }).then((res) => {
         setRefs(res.data.data);
@@ -65,6 +93,10 @@ const ReferenceDrawer = ({
           {referenceQuery.isSuccess && (
             <>
               {referenceQuery.data.map((item, index) => {
+                const { abstract_text, title, id } = item;
+                const abstractText = removeHTMLTags(abstract_text);
+                const abstractTextRefactored = abstractText.slice(0, 200);
+                console.log(deletingReferenceindex === id);
                 return (
                   <Box
                     component="div"
@@ -76,16 +108,35 @@ const ReferenceDrawer = ({
                       component="h5"
                       className="text-black py-2 font-semibold"
                     >
-                      {item?.title}
+                      {title}
                     </Typography>
 
-                    <span
-                      // onClick={toggleDescription}
-                      className="capitalize text-gray-600"
-                    >
-                      {/* {showFullDescription ? "Read Less" : "Read More"} */}
-                      {removeHTMLTags(item.abstract_text)}
-                    </span>
+                    <div className="capitalize text-gray-600 mb-5">
+                      {showFullDescription !== index
+                        ? abstractTextRefactored + ". . ."
+                        : abstractText}
+                      <span
+                        className=" absolute right-0 bottom-0 cursor-pointer bg-black rounded-tl-md rounded-br-md text-sm hover:bg-gray-600 px-2 py-1 text-white"
+                        onClick={() => toggleDescription(index)}
+                      >
+                        {showFullDescription === index
+                          ? "Read Less"
+                          : "Read More"}
+                      </span>
+                      <span
+                        className=" absolute right-[5.5rem] bottom-0 cursor-pointer bg-black rounded-t-md  text-sm px-2 py-1 hover:bg-gray-600  text-white"
+                        onClick={() => deleteReference(id, index)}
+                      >
+                        Delete
+                      </span>
+
+                      {deleteReferenceMutation.isLoading &&
+                        deletingReferenceindex === index && (
+                          <div className="flex items-center  justify-center my-5">
+                            <Loading />
+                          </div>
+                        )}
+                    </div>
                   </Box>
                 );
               })}
