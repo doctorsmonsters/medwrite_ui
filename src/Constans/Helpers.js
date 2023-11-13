@@ -77,7 +77,7 @@ export const referenceStyles = [
 export const referenceMaker = (style, reference) => {
   const authString = reference?.configurations?.authorString;
   const source = reference?.configurations?.source;
-  const link = reference?.configurations?.link;
+  // const link = reference?.configurations?.link;
   const journalInfo = reference?.configurations?.journalInfo;
   const publishDate = journalInfo?.dateOfPublication;
   let content;
@@ -91,7 +91,6 @@ export const referenceMaker = (style, reference) => {
             <em>${reference?.title}</em>
             <i>${source}</i>.
           </p>
-          <p>${link}</p>
         </div>
       `;
       break;
@@ -101,7 +100,7 @@ export const referenceMaker = (style, reference) => {
           <p>${authString}</p>
           <p>
             <i>${reference?.title}</i>
-            ${source},${publishDate}.
+            ${source}, ${publishDate}.
           </p>
         </div>
       `;

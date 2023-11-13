@@ -14,11 +14,24 @@ const SearchDrawer = ({
   search,
   setSearch,
   article,
+  refs,
   addTextToEditor,
+  selectedStyle,
 }) => {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useSystem();
   const [refIndex, setRefIndex] = React.useState(null);
+  const [selectedText, setSelectedText] = React.useState("");
+
+  React.useEffect(() => {
+    const selecteText = () => {
+      const selection = window.getSelection().toString();
+      if (selection) setSelectedText(selection);
+    };
+
+    window.addEventListener("mouseup", selecteText);
+    return () => window.removeEventListener("mouseup", selecteText);
+  }, []);
 
   const searchMutation = useMutation({
     mutationFn: (data) =>
@@ -41,6 +54,10 @@ const SearchDrawer = ({
       createReference(data)
         .then((res) => {
           showSuccess("Reference has been added successfully.");
+          if (selectedText) {
+            addTextToEditor(selectedText);
+            setSelectedText("");
+          }
           return res.data;
         })
         .catch((error) => {
@@ -51,6 +68,13 @@ const SearchDrawer = ({
       queryClient.invalidateQueries(["references"]);
     },
   });
+
+  const handleRefer = (data) => {
+    const refArray = refs.map((i) => i.pmc_id);
+    if (refArray.includes(data.pmc_id))
+      return showError("Reference to this article already exists.");
+    referenceMutation.mutate(data);
+  };
 
   return (
     <Drawer
@@ -122,27 +146,31 @@ const SearchDrawer = ({
                 return (
                   <Box
                     component="div"
-                    className="p-3 mx-2 my-3 bg-[#f9f9f9] rounded-md relative"
+                    className="mx-2 my-3 bg-[#f9f9f9] rounded-md relative"
                     key={index}
                   >
                     {referenceMutation.isLoading && refIndex === index && (
-                      <div className="absolute h-full w-full bg-gray-200 opacity-60 flex items-center justify-center">
+                      <div className="absolute h-full w-full bg-gray-200 opacity-100 flex items-center justify-center">
                         <Loading />
                       </div>
                     )}
-                    <Typography
-                      variant="body1"
-                      component="h5"
-                      className="text-black py-2 font-semibold"
-                    >
-                      {item?.title}
-                    </Typography>
-                    <CardButtons
-                      item={item}
-                      article={article}
-                      handleSelect={referenceMutation.mutate}
-                      setRefIndex={() => setRefIndex(index)}
-                    />
+
+                    <div className="p-3">
+                      <Typography
+                        variant="body1"
+                        component="h5"
+                        className="text-black py-2 font-semibold"
+                      >
+                        {item?.title}
+                      </Typography>
+                      <CardButtons
+                        item={item}
+                        article={article}
+                        handleSelect={handleRefer}
+                        setRefIndex={() => setRefIndex(index)}
+                        selectedStyle={selectedStyle}
+                      />
+                    </div>
                   </Box>
                 );
               })}

@@ -1,12 +1,12 @@
 import React from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteReferences,
   getReferences,
 } from "../../../Services/Reference.service";
 import { Drawer, Box, Typography } from "@mui/material";
 import { MdOutlineStyle } from "react-icons/md";
-import { removeHTMLTags } from "../../../Constans/Helpers";
+import { referenceMaker } from "../../../Constans/Helpers";
 import Loading from "../../../Components/Loading";
 
 const ReferenceDrawer = ({
@@ -14,15 +14,12 @@ const ReferenceDrawer = ({
   setOpen,
   article,
   setRefStyleOpen,
+  selectedStyle,
   setRefs,
 }) => {
-  const [showFullDescription, setShowFullDescription] = React.useState(null);
+  const queryClient = useQueryClient();
   const [deletingReferenceindex, setdeletingReferenceindex] =
     React.useState(null);
-
-  const toggleDescription = (index) => {
-    setShowFullDescription(showFullDescription === index ? null : index);
-  };
 
   const deleteReference = (id, index) => {
     setdeletingReferenceindex(index);
@@ -39,10 +36,13 @@ const ReferenceDrawer = ({
           return error;
         })
         .finally(() => setdeletingReferenceindex(null)),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["references"]);
+    },
   });
 
   const referenceQuery = useQuery({
-    queryKey: ["references", deleteReferenceMutation.isSuccess],
+    queryKey: ["references"],
     queryFn: () =>
       getReferences({ article_id: article }).then((res) => {
         setRefs(res.data.data);
@@ -93,49 +93,34 @@ const ReferenceDrawer = ({
           {referenceQuery.isSuccess && (
             <>
               {referenceQuery.data.map((item, index) => {
-                const { abstract_text, title, id } = item;
-                const abstractText = removeHTMLTags(abstract_text);
-                const abstractTextRefactored = abstractText.slice(0, 200);
-                console.log(deletingReferenceindex === id);
                 return (
                   <Box
                     component="div"
-                    className="p-3 mx-2 my-3 bg-[#f9f9f9] rounded-md relative"
-                    key={index}
+                    className="mx-2 mb-6 bg-[#f9f9f9] rounded-md relative"
+                    key={item.id}
                   >
-                    <Typography
-                      variant="body1"
-                      component="h5"
-                      className="text-black py-2 font-semibold"
-                    >
-                      {title}
-                    </Typography>
+                    {deleteReferenceMutation.isLoading &&
+                      deletingReferenceindex === index && (
+                        <div className="absolute h-full w-full bg-gray-200 opacity-100 flex items-center justify-center">
+                          <Loading />
+                        </div>
+                      )}
+
+                    <Box
+                      component="div"
+                      className="!text-black p-5"
+                      dangerouslySetInnerHTML={{
+                        __html: referenceMaker(selectedStyle?.name, item),
+                      }}
+                    />
 
                     <div className="capitalize text-gray-600 mb-5">
-                      {showFullDescription !== index
-                        ? abstractTextRefactored + ". . ."
-                        : abstractText}
                       <span
-                        className=" absolute right-0 bottom-0 cursor-pointer bg-black rounded-tl-md rounded-br-md text-sm hover:bg-gray-600 px-2 py-1 text-white"
-                        onClick={() => toggleDescription(index)}
-                      >
-                        {showFullDescription === index
-                          ? "Read Less"
-                          : "Read More"}
-                      </span>
-                      <span
-                        className=" absolute right-[5.5rem] bottom-0 cursor-pointer bg-black rounded-t-md  text-sm px-2 py-1 hover:bg-gray-600  text-white"
-                        onClick={() => deleteReference(id, index)}
+                        className="absolute right-0 bottom-0 cursor-pointer bg-black rounded-t-md text-sm px-10 py-1 hover:bg-gray-600 text-white"
+                        onClick={() => deleteReference(item.id, index)}
                       >
                         Delete
                       </span>
-
-                      {deleteReferenceMutation.isLoading &&
-                        deletingReferenceindex === index && (
-                          <div className="flex items-center  justify-center my-5">
-                            <Loading />
-                          </div>
-                        )}
                     </div>
                   </Box>
                 );

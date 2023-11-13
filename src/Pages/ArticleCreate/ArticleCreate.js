@@ -8,11 +8,7 @@ import { getArticleById, updateArticle } from "../../Services/Article.service";
 import { TINYMCE_API_KEY } from "../../Constans/Api";
 import { processText } from "../../Services/Actions.service";
 import { Editor } from "@tinymce/tinymce-react";
-import {
-  referenceMaker,
-  referenceStyles,
-  removeHTMLTags,
-} from "../../Constans/Helpers";
+import { referenceStyles, removeHTMLTags } from "../../Constans/Helpers";
 import PromptModal from "../../Components/Modals/PromptModal";
 import LoadingModal from "../../Components/Modals/LoadingModal";
 import Loading from "../../Components/Loading";
@@ -75,6 +71,23 @@ const ArticleCreate = () => {
     }
   }, [editorRef.current]);
 
+  React.useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.altKey) {
+        if (event.key === "q") setOpen(true);
+        else if (event.key === "r") setRefOpen(true);
+        else if (event.key === "s") setRefStyleOpen(true);
+      } else if (event.key === "Escape") {
+        setOpen(false);
+        setRefOpen(false);
+        setRefStyleOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Quiries & Mutations
   const objectQuery = useQuery({
     queryFn: () =>
@@ -91,11 +104,29 @@ const ArticleCreate = () => {
     queryKey: ["articles", uuid],
   });
 
+  React.useEffect(() => {
+    if (objectQuery.data) {
+      const _refStyle = objectQuery.data.configurations;
+      if (_refStyle.hasOwnProperty("selectedStyle")) {
+        const _refStyleObject = referenceStyles.find(
+          (i) => _refStyle.selectedStyle === i.name
+        );
+
+        if (_refStyleObject !== undefined) {
+          setSelectedStyle(_refStyleObject);
+        }
+      }
+    }
+  }, [objectQuery.data]);
+
   const objectMutation = useMutation({
     mutationFn: () =>
       updateArticle(uuid, {
         ...artilceForm,
         content: editorRef.current.getContent(),
+        configurations: {
+          selectedStyle: selectedStyle?.name,
+        },
       })
         .then((res) => {
           navigate(`/articles/view/${uuid}`);
@@ -129,14 +160,6 @@ const ArticleCreate = () => {
 
   const handleArticleForm = ({ target: { name, value } }) => {
     setArticleForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = () => {
-    const _refrences = refs
-      .map((i) => referenceMaker(selectedStyle?.name, i))
-      .join("<br />");
-    EditorContentHandler("", _refrences);
-    objectMutation.mutate();
   };
 
   const EditorContentHandler = (type, data) => {
@@ -188,6 +211,10 @@ const ArticleCreate = () => {
           <Typography component="p" variant="body1">
             Write you article with an amzaing rich text editor & bundle of
             Generative AI Operations.
+          </Typography>
+          <Typography component="p" variant="body2" className="text-gray-700">
+            Shortcut Keys: Search Alt + Q, Reference Alt + R, Reference Styles
+            Alt + S
           </Typography>
         </Box>
 
@@ -333,7 +360,7 @@ const ArticleCreate = () => {
                 disabled={!artilceForm.title || !artilceForm.content}
                 classes="!px-10 !w-max"
                 loading={objectMutation.isLoading}
-                onClick={handleSave}
+                onClick={objectMutation.mutate}
               />
             </Box>
           </Box>
@@ -352,6 +379,8 @@ const ArticleCreate = () => {
         open={open}
         setOpen={setOpen}
         article={uuid}
+        refs={refs}
+        selectedStyle={selectedStyle}
         addTextToEditor={addTextToEditor}
       />
       <ReferenceDrawer

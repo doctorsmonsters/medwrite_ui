@@ -9,6 +9,7 @@ import Header from "../../Components/Header";
 import useSystem from "../../Hooks/useSystem";
 import ModalButton from "../../Components/Buttons/ModalButton";
 import Loading from "../../Components/Loading";
+import { referenceMaker } from "../../Constans/Helpers";
 
 const ArticleView = () => {
   const params = useParams();
@@ -42,7 +43,6 @@ const ArticleView = () => {
 
   React.useEffect(() => {
     document.title = `Med Writer | ${artilceQuery?.data?.title}`;
-
     return () => {
       document.title = "Med Writer";
     };
@@ -137,7 +137,17 @@ const ArticleView = () => {
                           margin-left: 20px
                         }
                       </style>
-                      ${artilceQuery.data.content}
+                      ${artilceQuery.data.content} 
+                      <br />
+                      <br />
+                      ${artilceQuery.data.references
+                        .map((i) =>
+                          referenceMaker(
+                            artilceQuery.data?.configurations?.selectedStyle,
+                            i
+                          )
+                        )
+                        .join("<br />")}
                     `,
                 }}
               />
