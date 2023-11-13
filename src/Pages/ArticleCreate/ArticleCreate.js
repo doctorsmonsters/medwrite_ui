@@ -387,6 +387,7 @@ const ArticleCreate = () => {
         open={refOpen}
         setOpen={setRefOpen}
         article={uuid}
+        selectedStyle={selectedStyle}
         setRefStyleOpen={setRefStyleOpen}
         setRefs={setRefs}
       />
