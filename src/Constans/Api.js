@@ -1,6 +1,6 @@
 // export const API_BASE_URL = "http://localhost:8000/api"; // dev
-// export const API_BASE_URL = "https://medwriter-backend.vercel.app/api"; // personal
-export const API_BASE_URL = "https://medwriter.vercel.app/api" // client
+// export const API_BASE_URL = "https://medwriter-backend.vercel.app/api"; // Client Hosted Url
+export const API_BASE_URL = "https://medwriter.vercel.app/api" // Personal Mantained Url
 
 
 export const GOOGLE_CLIENT_ID =

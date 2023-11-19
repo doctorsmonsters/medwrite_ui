@@ -6,7 +6,7 @@ import {
 } from "../../../Services/Reference.service";
 import { Drawer, Box, Typography } from "@mui/material";
 import { MdOutlineStyle } from "react-icons/md";
-import { referenceMaker } from "../../../Constans/Helpers";
+import ReferenceWrapper from "../../Wrapper/ReferenceWrapper/ReferenceWrapper";
 import Loading from "../../../Components/Loading";
 
 const ReferenceDrawer = ({
@@ -16,6 +16,7 @@ const ReferenceDrawer = ({
   setRefStyleOpen,
   selectedStyle,
   setRefs,
+  addTextToEditor,
 }) => {
   const queryClient = useQueryClient();
   const [deletingReferenceindex, setdeletingReferenceindex] =
@@ -92,39 +93,21 @@ const ReferenceDrawer = ({
           )}
           {referenceQuery.isSuccess && (
             <>
-              {referenceQuery.data.map((item, index) => {
-                return (
-                  <Box
-                    component="div"
-                    className="mx-2 mb-6 bg-[#f9f9f9] rounded-md relative"
-                    key={item.id}
-                  >
-                    {deleteReferenceMutation.isLoading &&
-                      deletingReferenceindex === index && (
-                        <div className="absolute h-full w-full bg-gray-200 opacity-100 flex items-center justify-center">
-                          <Loading />
-                        </div>
-                      )}
-
-                    <Box
-                      component="div"
-                      className="!text-black p-5"
-                      dangerouslySetInnerHTML={{
-                        __html: referenceMaker(selectedStyle?.name, item),
-                      }}
+              {referenceQuery.data
+                .sort((a, b) => b.ref_num < a.ref_num)
+                .map((item, index) => {
+                  return (
+                    <ReferenceWrapper
+                      index={index}
+                      item={item}
+                      selectedStyle={selectedStyle}
+                      deletingReferenceindex={deletingReferenceindex}
+                      deleteReferenceMutation={deleteReferenceMutation}
+                      deleteReference={deleteReference}
+                      addTextToEditor={addTextToEditor}
                     />
-
-                    <div className="capitalize text-gray-600 mb-5">
-                      <span
-                        className="absolute right-0 bottom-0 cursor-pointer bg-black rounded-t-md text-sm px-10 py-1 hover:bg-gray-600 text-white"
-                        onClick={() => deleteReference(item.id, index)}
-                      >
-                        Delete
-                      </span>
-                    </div>
-                  </Box>
-                );
-              })}
+                  );
+                })}
             </>
           )}
         </Box>

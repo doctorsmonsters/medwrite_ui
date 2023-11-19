@@ -117,7 +117,7 @@ const ArticleView = () => {
         {artilceQuery.isSuccess && (
           <Box className="my-12">
             <Box className="controls flex flex-wrap justify-end px-5 gap-3 bg-green-dark py-3">
-              {user.isLogged && user.user.pk === artilceQuery.data.user
+              {user.isLogged && user?.user?.pk === artilceQuery.data.user
                 ? userActions
                 : publicActions}
             </Box>
@@ -141,12 +141,22 @@ const ArticleView = () => {
                       <br />
                       <br />
                       ${artilceQuery.data.references
-                        .map((i) =>
-                          referenceMaker(
+                        .sort((a, b) => b.ref_num < a.ref_num)
+                        .map((i) => {
+                          const ref = referenceMaker(
                             artilceQuery.data?.configurations?.selectedStyle,
                             i
-                          )
-                        )
+                          );
+                          const order = `
+                          <div class="flex gap-x-3">
+                            <span class="font-bold">
+                              ${i.ref_num} -
+                            </span> 
+                              ${ref}
+                          </div>
+                          `;
+                          return order;
+                        })
                         .join("<br />")}
                     `,
                 }}

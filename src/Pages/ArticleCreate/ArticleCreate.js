@@ -20,6 +20,7 @@ import CircularButton from "../../Components/Buttons/CircularButton/CircularButt
 import ModalButton from "../../Components/Buttons/ModalButton";
 import ReferenceDrawer from "../../Components/Drawer/ReferenceDrawer/ReferenceDrawer";
 import ReferenceStyleModal from "../../Components/Modals/ReferenceStyleModal";
+import RefSelectDrawer from "../../Components/Drawer/RefSelectDrawer/RefSelectDrawer";
 
 const ArticleCreate = () => {
   const queryClient = useQueryClient();
@@ -38,6 +39,7 @@ const ArticleCreate = () => {
   const [refOpen, setRefOpen] = React.useState(false);
   const [selectedStyle, setSelectedStyle] = React.useState(referenceStyles[2]);
   const [refStyleOpen, setRefStyleOpen] = React.useState(false);
+  const [refSelectOpen, setRefSelectOpen] = React.useState(false);
   const [artilceForm, setArticleForm] = React.useState({
     title: "",
     content: "",
@@ -105,7 +107,7 @@ const ArticleCreate = () => {
   });
 
   React.useEffect(() => {
-    if (objectQuery.data) {
+    if (objectQuery.data?.configurations) {
       const _refStyle = objectQuery.data.configurations;
       if (_refStyle.hasOwnProperty("selectedStyle")) {
         const _refStyleObject = referenceStyles.find(
@@ -182,7 +184,7 @@ const ArticleCreate = () => {
         editorRef.current.execCommand("mceInsertContent", false, data);
         break;
       default:
-        break;
+        editorRef.current.execCommand("mceInsertContent", false, data);
     }
   };
 
@@ -256,11 +258,12 @@ const ArticleCreate = () => {
                 init={{
                   height: 400,
                   width: "100%",
+                  noneditable_class: "uneditable",
                   toolbar: [
                     "undo redo | fontsize | forecolor backcolor | styleselect | heading bold italic |" +
                       "alignleft aligncenter alignright alignjustify | " +
                       "bullist numlist | outdent indent | link image",
-                    "bullets prompt rephrase summarize",
+                    "bullets prompt rephrase summarize references",
                   ],
                   menubar: true,
                   plugins:
@@ -349,6 +352,17 @@ const ArticleCreate = () => {
                         );
                       },
                     });
+
+                    editor.ui.registry.addButton("references", {
+                      text: "References",
+                      onAction: () => {
+                        if (!refs && !refs?.length)
+                          return showError(
+                            "You Don't have any references yet!"
+                          );
+                        else setRefSelectOpen((prev) => !prev);
+                      },
+                    });
                   },
                 }}
               />
@@ -390,6 +404,13 @@ const ArticleCreate = () => {
         selectedStyle={selectedStyle}
         setRefStyleOpen={setRefStyleOpen}
         setRefs={setRefs}
+        addTextToEditor={EditorContentHandler}
+      />
+      <RefSelectDrawer
+        open={refSelectOpen}
+        setOpen={setRefSelectOpen}
+        refs={refs}
+        addTextToEditor={EditorContentHandler}
       />
       <ReferenceStyleModal
         open={refStyleOpen}
